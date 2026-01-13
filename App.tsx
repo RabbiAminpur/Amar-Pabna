@@ -13,7 +13,7 @@ const DATA: AreaInfo[] = [
     id: '6',
     title: 'হোটেল নুর, কাশিনাথপুর',
     category: Category.HOTEL,
-    description: 'কাশিনাথপুর এলাকার একটি আধুনিক আবাসিক হোটেল। এখানে উন্নত মানের এসি (AC) এবং নন-এসি রুমের ব্যবস্থা রয়েছে। ভ্রমণকারী বা ব্যবসায়িক প্রয়োজনে আসা মেহমানদের জন্য এটি একটি নিরাপদ ও আরামদায়ক আবাসন। হোটেলের নিচেই প্রয়োজনীয় বাজার ও যাতায়াতের সুব্যবস্থা রয়েছে।',
+    description: 'কাশিনাথপুর এলাকার একটি আধুনিক আবাসিক হোটেল। এখানে উন্নত মানের এসি (AC) এবং নন-এসি রুমের ব্যবস্থা রয়েছে। ভ্রমণকারী বা ব্যবসায়িক প্রয়োজনে আসা মেহমানদের জন্য এটি একটি নিরাপদ ও আরামদায়ক আবাসন। হোটেলের নিচেই প্রয়োজনীয় বাজার ও যাতায়াতের সুব্যবস্থা রয়েছে।',
     addresses: ['নুর প্লাজা, কাশিনাথপুর ফুলবাগান ট্রাফিক মোড়, আমিনপুর, পাবনা', 'XJ54+CR Kashinathpur, Bangladesh'],
     contacts: ['01775142831'],
     imageUrl: 'https://i.ibb.co/1Gy7sVSb/IMG-20260113-222912.jpg',
@@ -153,7 +153,7 @@ const HomeView: React.FC<HomeViewProps> = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="পাবনার তথ্য খুঁজুন..."
+            placeholder="নাম, নম্বর বা ঠিকানা দিয়ে খুঁজুন..."
             className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -179,7 +179,7 @@ const HomeView: React.FC<HomeViewProps> = ({
 
     <main className="max-w-md mx-auto px-4 mt-6">
       <div className="grid grid-cols-2 gap-3 pb-20">
-        {filteredData.map((item) => (
+        {filteredData.length > 0 ? filteredData.map((item) => (
           <div 
             key={item.id} 
             onClick={() => navigateToAreaItem(item)} 
@@ -208,7 +208,14 @@ const HomeView: React.FC<HomeViewProps> = ({
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="col-span-2 py-20 text-center space-y-4">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
+              <Search className="w-8 h-8 text-gray-300" />
+            </div>
+            <p className="text-sm text-gray-400 font-medium">দুঃখিত, কোনো তথ্য পাওয়া যায়নি</p>
+          </div>
+        )}
       </div>
     </main>
   </>
@@ -583,9 +590,13 @@ const App: React.FC = () => {
   const filteredData = useMemo(() => {
     const searchStr = searchTerm.toLowerCase();
     return DATA.filter(item => {
+      // বিস্তৃত সার্চ লজিক: টাইটেল, ডেসক্রিপশন, ক্যাটাগরি, ঠিকানা এবং ফোন নম্বর দিয়েও সার্চ করা যাবে
       const matchesSearch = item.title.toLowerCase().includes(searchStr) || 
                            item.description.toLowerCase().includes(searchStr) ||
-                           item.addresses.some(a => a.toLowerCase().includes(searchStr));
+                           item.category.toLowerCase().includes(searchStr) ||
+                           item.addresses.some(a => a.toLowerCase().includes(searchStr)) ||
+                           item.contacts.some(c => c.toLowerCase().includes(searchStr));
+                           
       const matchesCategory = selectedCategory === 'সব' || item.category === selectedCategory;
       const matchesSaved = !showSavedOnly || savedIds.includes(item.id);
       return matchesSearch && matchesCategory && matchesSaved;
