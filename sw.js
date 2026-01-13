@@ -1,9 +1,9 @@
 
 const CACHE_NAME = 'amar-pabna-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  './',
+  './index.html',
+  './manifest.json',
   'https://fonts.maateen.me/solaiman-lipi/font.css'
 ];
 
@@ -44,9 +44,9 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     }).catch(() => {
-      // যদি নেটওয়ার্ক না থাকে এবং ক্যাশেও না থাকে (যেমন নতুন পেজ)
+      // যদি নেটওয়ার্ক না থাকে এবং ক্যাশেও না থাকে
       if (event.request.mode === 'navigate') {
-        return caches.match('/index.html');
+        return caches.match('./index.html');
       }
     })
   );

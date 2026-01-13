@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#4f46e5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <title>আমার পাবনা - এলাকার তথ্য ভাণ্ডার</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
@@ -42,10 +42,12 @@
       // Service Worker Registration for Offline Support
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(reg => {
+          // Using relative path './sw.js' to fix origin mismatch in preview environments
+          navigator.serviceWorker.register('./sw.js').then(reg => {
             console.log('SW Registered!', reg);
           }).catch(err => {
-            console.log('SW Registration Failed!', err);
+            // Handle registration errors gracefully in restricted environments
+            console.warn('SW Registration status:', err.message);
           });
         });
       }
