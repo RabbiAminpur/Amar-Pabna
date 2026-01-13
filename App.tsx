@@ -114,17 +114,17 @@ interface HomeViewProps {
   savedIds: string[];
   isOffline: boolean;
   openAbout: () => void;
+  dynamicAreas: string[];
 }
 
 const HomeView: React.FC<HomeViewProps> = ({ 
   searchTerm, setSearchTerm, selectedUpazila, setSelectedUpazila,
   selectedArea, setSelectedArea, selectedCategory, setSelectedCategory,
   showSavedOnly, setShowSavedOnly, visibleData, loadMore, hasMore,
-  navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout 
+  navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout,
+  dynamicAreas
 }) => {
-  
   const upazilas = Object.keys(PABNA_MAP);
-  const areas = selectedUpazila !== 'সব' ? PABNA_MAP[selectedUpazila] || [] : [];
 
   return (
     <>
@@ -137,7 +137,7 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
           
-          <div className="flex justify-between items-center mb-5">
+          <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold text-indigo-700 flex items-center gap-2">
               <MapPin className="w-6 h-6 fill-indigo-100" />
               আমার পাবনা
@@ -158,77 +158,103 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* অ্যাডভান্সড ফিল্টার বক্স */}
-          <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 mb-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Filter className="w-4 h-4 text-indigo-600" />
-              <span className="text-xs font-bold text-indigo-900">দ্রুত ফিল্টার করুন</span>
+          {/* ১. উপজেলা ও এলাকা ড্রপডাউন ফিল্টার বক্স */}
+          <div className="bg-indigo-50/40 p-3.5 rounded-2xl border border-indigo-100 mb-4 space-y-2.5">
+            <div className="flex items-center gap-2 mb-0.5">
+              <Filter className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="text-[11px] font-bold text-indigo-900 uppercase tracking-tight">অ্যাডভান্সড সার্চ</span>
             </div>
             
             <div className="grid grid-cols-2 gap-2">
               {/* উপজেলা সিলেকশন */}
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <Building2 className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-400" />
                 <select 
-                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-indigo-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500 appearance-none"
+                  className="w-full pl-8 pr-6 py-2 bg-white border border-indigo-100 rounded-xl text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm"
                   value={selectedUpazila}
                   onChange={(e) => { setSelectedUpazila(e.target.value); setSelectedArea('সব'); }}
                 >
                   <option value="সব">সব উপজেলা</option>
                   {upazilas.map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300 pointer-events-none" />
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-300 pointer-events-none" />
               </div>
 
-              {/* এলাকা সিলেকশন */}
+              {/* এলাকা সিলেকশন ড্রপডাউন */}
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-400" />
                 <select 
-                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-indigo-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500 appearance-none disabled:opacity-50"
+                  className="w-full pl-8 pr-6 py-2 bg-white border border-indigo-100 rounded-xl text-[11px] font-bold text-gray-700 focus:ring-2 focus:ring-indigo-500 appearance-none disabled:bg-gray-50/50 shadow-sm"
                   value={selectedArea}
                   onChange={(e) => setSelectedArea(e.target.value)}
                   disabled={selectedUpazila === 'সব'}
                 >
                   <option value="সব">সব এলাকা</option>
-                  {areas.map(a => <option key={a} value={a}>{a}</option>)}
+                  {(PABNA_MAP[selectedUpazila] || []).map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300 pointer-events-none" />
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-indigo-300 pointer-events-none" />
               </div>
-            </div>
-
-            {/* ক্যাটাগরি সিলেকশন ড্রপডাউন */}
-            <div className="relative">
-              <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
-              <select 
-                className="w-full pl-9 pr-3 py-2.5 bg-white border border-indigo-100 rounded-xl text-xs font-medium focus:ring-2 focus:ring-indigo-500 appearance-none"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value as Category | 'সব')}
-              >
-                <option value="সব">সব ক্যাটাগরি</option>
-                {Object.values(Category).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300 pointer-events-none" />
             </div>
           </div>
           
-          {/* সার্চ বক্স */}
-          <div className="relative">
+          {/* ২. সার্চ বক্স */}
+          <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="নাম বা কন্টেন্ট লিখে খুঁজুন..."
+              placeholder="নাম, নম্বর বা বিবরণ লিখে খুঁজুন..."
               className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400"
-              >
+              <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400">
                 <X className="w-4 h-4" />
               </button>
             )}
+          </div>
+
+          {/* ৩. হরিজন্টাল চিপস ফিল্টার (ক্যাটাগরি ও এলাকা) */}
+          <div className="space-y-3">
+            {/* সার্ভিস ক্যাটাগরি চিপস */}
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center">
+              <span className="text-[9px] font-bold text-gray-400 uppercase shrink-0 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-100">সেবা</span>
+              <button 
+                onClick={() => setSelectedCategory('সব')} 
+                className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[11px] font-bold transition-all ${selectedCategory === 'সব' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}
+              >
+                সব ক্যাটাগরি
+              </button>
+              {Object.values(Category).map((cat) => (
+                <button 
+                  key={cat} 
+                  onClick={() => setSelectedCategory(cat)} 
+                  className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[11px] font-bold transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* এলাকা চিপস (উপজেলা ভিত্তিক ডাইনামিক) */}
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center">
+              <span className="text-[9px] font-bold text-gray-400 uppercase shrink-0 bg-gray-50 px-2 py-1.5 rounded-lg border border-gray-100">এলাকা</span>
+              <button 
+                onClick={() => setSelectedArea('সব')} 
+                className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[11px] font-bold transition-all ${selectedArea === 'সব' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white border border-gray-100 text-gray-500'}`}
+              >
+                সব {selectedUpazila !== 'সব' ? selectedUpazila : 'এলাকা'}
+              </button>
+              {dynamicAreas.map((loc) => (
+                <button 
+                  key={loc} 
+                  onClick={() => setSelectedArea(loc)} 
+                  className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[11px] font-bold transition-all ${selectedArea === loc ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white border border-gray-100 text-gray-500'}`}
+                >
+                  {loc}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </header>
@@ -250,7 +276,7 @@ const HomeView: React.FC<HomeViewProps> = ({
               
               {item.imageUrl && (
                 <div className="aspect-video w-full overflow-hidden bg-gray-100">
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500" loading="lazy" />
                 </div>
               )}
               <div className="p-3">
@@ -259,7 +285,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                     {item.category}
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-gray-800 leading-tight line-clamp-2 min-h-[2.5rem]">{item.title}</h3>
+                <h3 className="text-[13px] font-bold text-gray-800 leading-tight line-clamp-2 min-h-[2.4rem]">{item.title}</h3>
                 <div className="flex items-start gap-1 text-[9px] text-gray-500 mt-2 pt-2 border-t border-gray-50">
                   <MapPin className="w-2.5 h-2.5 text-indigo-400 shrink-0 mt-0.5" /> 
                   <span className="truncate">{item.area}, {item.upazila}</span>
@@ -396,7 +422,7 @@ const DetailView: React.FC<{
 const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
   <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
     <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4">
-      <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl">
+      <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
         <ArrowLeft className="w-6 h-6 text-gray-600" />
       </button>
       <h2 className="text-lg font-bold text-gray-800">অ্যাপ সম্পর্কিত</h2>
@@ -407,17 +433,17 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
           <MapPin className="w-10 h-10 text-white" />
         </div>
         <h3 className="text-2xl font-bold text-gray-800">আমার পাবনা</h3>
-        <p className="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ১.১.০ (অ্যাডভান্সড ফিল্টার)</p>
+        <p className="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ১.২.০ (হাইব্রিড ফিল্টার)</p>
       </div>
       <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার</h4>
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">ডেভেলপার প্রোফাইল</h4>
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm">
+          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm border border-gray-50">
             <img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" />
           </div>
           <div>
             <h5 className="font-bold text-gray-800">মীর রাব্বি হোসেন</h5>
-            <p className="text-xs text-indigo-600 font-bold">বিবিএ (অনার্স), মালয়েশিয়া প্রবাসী</p>
+            <p className="text-xs text-indigo-600 font-bold">বিবিএ (অনার্স), পাবনা</p>
           </div>
         </div>
       </section>
@@ -459,6 +485,17 @@ const App: React.FC = () => {
     localStorage.setItem('amar_pabna_saved', JSON.stringify(savedIds));
   }, [savedIds]);
 
+  // ডাইনামিক এলাকা চিপস তৈরির লজিক (উপজেলা ফিল্টার অনুযায়ী)
+  const dynamicAreas = useMemo(() => {
+    if (selectedUpazila !== 'সব') {
+      return PABNA_MAP[selectedUpazila] || [];
+    }
+    // যদি কোনো উপজেলা সিলেক্ট না থাকে, তবে সব কন্টেন্ট থেকে ইউনিক এলাকা বের করো
+    const areas = new Set<string>();
+    DATA.forEach(item => areas.add(item.area));
+    return Array.from(areas).sort();
+  }, [selectedUpazila]);
+
   const toggleSave = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setSavedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -467,6 +504,7 @@ const App: React.FC = () => {
   const filteredData = useMemo(() => {
     const searchStr = searchTerm.toLowerCase();
     return DATA.filter(item => {
+      // বিস্তৃত সার্চ: টাইটেল, বিবরণ, ঠিকানা ও ফোন নম্বর
       const matchesSearch = item.title.toLowerCase().includes(searchStr) || 
                            item.description.toLowerCase().includes(searchStr) ||
                            item.addresses.some(a => a.toLowerCase().includes(searchStr)) ||
@@ -504,8 +542,10 @@ const App: React.FC = () => {
           selectedArea={selectedArea} setSelectedArea={setSelectedArea}
           selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
           showSavedOnly={showSavedOnly} setShowSavedOnly={setShowSavedOnly}
-          visibleData={visibleData} loadMore={() => setVisibleCount(v => v + ITEMS_PER_PAGE)}
+          visibleData={visibleData} 
+          loadMore={() => setVisibleCount(v => v + ITEMS_PER_PAGE)}
           hasMore={visibleCount < filteredData.length}
+          dynamicAreas={dynamicAreas}
           navigateToAreaItem={(item) => { setSelectedAreaItem(item); setCurrentView('area-detail'); window.scrollTo({ top: 0 }); }}
           toggleSave={toggleSave} savedIds={savedIds} isOffline={isOffline}
           openAbout={() => setCurrentView('about')}
