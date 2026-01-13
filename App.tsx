@@ -3,9 +3,21 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, WifiOff,
-  Clock, ChevronDown
+  Clock, ChevronDown, LayoutGrid
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
+
+// প্রতিটি ক্যাটাগরির জন্য ইমেজ ম্যাপিং
+const CATEGORY_DATA = [
+  { name: Category.HEALTH, img: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.BUS_COUNTER, img: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.FOOD, img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.HOTEL, img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.EDUCATION, img: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.AMBULANCE, img: 'https://images.unsplash.com/photo-1587744374828-3c483696a664?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.COURIER, img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80' },
+  { name: Category.OTHER, img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80' },
+];
 
 const DATA: AreaInfo[] = [
   {
@@ -80,9 +92,60 @@ const DATA: AreaInfo[] = [
   }
 ];
 
+const ImageSlider: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const sliderImages = useMemo(() => {
+    return [...DATA]
+      .filter(item => !!item.imageUrl)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 5)
+      .map(item => item.imageUrl);
+  }, []);
+
+  useEffect(() => {
+    if (sliderImages.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % sliderImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [sliderImages]);
+
+  if (sliderImages.length === 0) return null;
+
+  return (
+    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl mb-6 shadow-sm border border-gray-100 pointer-events-none">
+      <div 
+        className="flex transition-transform duration-700 ease-in-out h-full"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {sliderImages.map((img, idx) => (
+          <img 
+            key={idx} 
+            src={img} 
+            className="w-full h-full object-cover shrink-0" 
+            alt="Slider" 
+          />
+        ))}
+      </div>
+      {/* স্লাইডার ইন্ডিকেটর (বিন্দুগুলো) */}
+      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+        {sliderImages.map((_, idx) => (
+          <div 
+            key={idx} 
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentIndex === idx ? 'bg-white w-4' : 'bg-white/40'}`} 
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 interface HomeViewProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  selectedCategory: Category | 'সব';
+  setSelectedCategory: (cat: Category | 'সব') => void;
   showSavedOnly: boolean;
   setShowSavedOnly: (val: boolean) => void;
   visibleData: AreaInfo[];
@@ -96,12 +159,13 @@ interface HomeViewProps {
 }
 
 const HomeView: React.FC<HomeViewProps> = ({ 
-  searchTerm, setSearchTerm, showSavedOnly, setShowSavedOnly, visibleData, 
-  loadMore, hasMore, navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout 
+  searchTerm, setSearchTerm, selectedCategory, setSelectedCategory,
+  showSavedOnly, setShowSavedOnly, visibleData, loadMore, hasMore,
+  navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout 
 }) => {
   return (
     <>
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 shadow-sm safe-top">
+      <header className="bg-white px-4 pt-6 pb-2 safe-top border-b border-gray-50">
         <div className="max-w-md mx-auto">
           {isOffline && (
             <div className="flex items-center justify-center gap-2 mb-3 bg-amber-50 py-1.5 rounded-lg border border-amber-100">
@@ -110,7 +174,7 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           )}
           
-          <div className="flex justify-between items-center mb-5">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-indigo-700 flex items-center gap-2">
               <MapPin className="w-6 h-6 fill-indigo-100" />
               আমার পাবনা
@@ -118,25 +182,66 @@ const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex gap-2">
               <button 
                 onClick={() => setShowSavedOnly(!showSavedOnly)}
-                className={`p-2 rounded-xl transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
+                className={`p-2.5 rounded-xl transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
               >
                 <Heart className={`w-5 h-5 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
               </button>
               <button 
                 onClick={openAbout}
-                className="p-2 bg-gray-50 border border-gray-100 text-gray-400 rounded-xl"
+                className="p-2.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-xl"
               >
                 <Info className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* সার্চ বক্স - এখন অনেক বড় এবং ইন্টারফেসের কেন্দ্রবিন্দু */}
-          <div className="relative">
+          {/* অটো ইমেজ স্লাইডার (১৬:৯) */}
+          <ImageSlider />
+
+          {/* ক্যাটাগরি গ্রিড */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                ক্যাটাগরি ভিত্তিক সেবা
+              </h2>
+              {selectedCategory !== 'সব' && (
+                <button 
+                  onClick={() => setSelectedCategory('সব')}
+                  className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md"
+                >
+                  সব ক্যাটাগরি
+                </button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              {CATEGORY_DATA.map((cat) => (
+                <div 
+                  key={cat.name}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`relative group h-24 rounded-2xl overflow-hidden cursor-pointer transition-all border-2 ${selectedCategory === cat.name ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-transparent shadow-sm'}`}
+                >
+                  <img 
+                    src={cat.img} 
+                    className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" 
+                    alt={cat.name} 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[11px] font-bold text-white text-center drop-shadow-md">{cat.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* সার্চ বক্স */}
+          <div className="relative mb-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="যেকোনো নাম বা ঠিকানা লিখে খুঁজুন..."
+              placeholder={`${selectedCategory === 'সব' ? 'যেকোনো' : selectedCategory} সেবা খুঁজুন...`}
               className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm font-medium shadow-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -151,6 +256,15 @@ const HomeView: React.FC<HomeViewProps> = ({
       </header>
 
       <main className="max-w-md mx-auto px-4 mt-6">
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            {selectedCategory === 'সব' ? 'সাম্প্রতিক তথ্য' : `${selectedCategory} রেজাল্ট`}
+          </h2>
+          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+            {visibleData.length} টি তথ্য
+          </span>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 pb-8">
           {visibleData.length > 0 ? visibleData.map((item) => (
             <div 
@@ -184,7 +298,13 @@ const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
                 <Search className="w-10 h-10 text-gray-200" />
               </div>
-              <p className="text-sm text-gray-400 font-medium">কিছু খুঁজে পাওয়া যায়নি</p>
+              <p className="text-sm text-gray-400 font-medium">এই ক্যাটাগরিতে কোনো তথ্য পাওয়া যায়নি</p>
+              <button 
+                onClick={() => setSelectedCategory('সব')}
+                className="text-xs font-bold text-indigo-600 underline"
+              >
+                সব ক্যাটাগরি দেখুন
+              </button>
             </div>
           )}
         </div>
@@ -301,7 +421,7 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
           <MapPin className="w-10 h-10 text-white" />
         </div>
         <h3 className="text-2xl font-bold text-gray-800">আমার পাবনা</h3>
-        <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৩.০ (সুপার ক্লিন)</p>
+        <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৩.২ (স্লাইডার)</p>
       </div>
       <section className="space-y-4">
         <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার</h4>
@@ -325,6 +445,7 @@ const ITEMS_PER_PAGE = 20;
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<Category | 'সব'>('সব');
   const [selectedAreaItem, setSelectedAreaItem] = useState<AreaInfo | null>(null);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
@@ -357,20 +478,23 @@ const App: React.FC = () => {
                            item.addresses.some(a => a.toLowerCase().includes(str)) ||
                            item.contacts.some(c => c.toLowerCase().includes(str));
                            
+      const matchesCategory = selectedCategory === 'সব' || item.category === selectedCategory;
       const matchesSaved = !showSavedOnly || savedIds.includes(item.id);
-      return matchesSearch && matchesSaved;
+      
+      return matchesSearch && matchesCategory && matchesSaved;
     }).sort((a, b) => b.timestamp - a.timestamp);
-  }, [searchTerm, showSavedOnly, savedIds]);
+  }, [searchTerm, selectedCategory, showSavedOnly, savedIds]);
 
   const visibleData = useMemo(() => filteredData.slice(0, visibleCount), [filteredData, visibleCount]);
 
-  useEffect(() => { setVisibleCount(ITEMS_PER_PAGE); }, [searchTerm, showSavedOnly]);
+  useEffect(() => { setVisibleCount(ITEMS_PER_PAGE); }, [searchTerm, selectedCategory, showSavedOnly]);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       {currentView === 'home' && (
         <HomeView 
           searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+          selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
           showSavedOnly={showSavedOnly} setShowSavedOnly={setShowSavedOnly}
           visibleData={visibleData} 
           loadMore={() => setVisibleCount(v => v + ITEMS_PER_PAGE)}
