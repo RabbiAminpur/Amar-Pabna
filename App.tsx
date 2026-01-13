@@ -76,6 +76,19 @@ const UPAZILA_DATA: UpazilaInfo[] = [
 
 const DATA: AreaInfo[] = [
   {
+    id: 'hotel-noor-1',
+    title: 'হোটেল নুর আবাসিক',
+    category: Category.HOTEL,
+    upazila: 'বেড়া',
+    area: 'কাশিনাথপুর',
+    description: 'হোটেল নুর আবাসিক পাবনা জেলার বেড়া উপজেলার কাশিনাথপুর এলাকায় অবস্থিত একটি উন্নত মানের আবাসিক হোটেল। মনোরম পরিবেশে নিরাপদ আবাসন নিশ্চিত করতে এটি কাশিনাথপুর মোড়ে অন্যতম বিশ্বস্ত প্রতিষ্ঠান।',
+    addresses: ['নুর প্লাজা, কাশিনাথপুর ফুলবাগান মোড়, আমিনপুর, বেড়া, পাবনা।'],
+    contacts: ['০১৭৭৫১৪২৮৩১'],
+    imageUrl: 'https://i.ibb.co/1Gy7sVSb/IMG-20260113-222912.jpg',
+    addedBy: 'মীর রাব্বি হোসেন',
+    timestamp: Date.now(),
+  },
+  {
     id: 'police-1',
     title: 'পাবনা সদর থানা',
     category: Category.POLICE,
@@ -694,9 +707,22 @@ const App: React.FC = () => {
             <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider mb-2 inline-block">{selectedAreaItem.category}</span>
             <h2 className="text-2xl font-black text-gray-800 mb-4 leading-tight">{selectedAreaItem.title}</h2>
-            <div className="flex items-center gap-1.5 mb-6 text-gray-400">
-              <MapPin className="w-3.5 h-3.5" /> <span className="text-[11px] font-bold uppercase">{selectedAreaItem.area}</span>
+            
+            <div className="space-y-4 mb-8">
+              <div className="flex items-center gap-3 text-gray-600">
+                <MapPin className="w-4 h-4 text-indigo-500" />
+                <span className="text-sm font-bold">{selectedAreaItem.addresses?.[0] || selectedAreaItem.area}</span>
+              </div>
+              {selectedAreaItem.contacts && selectedAreaItem.contacts.length > 0 && (
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Phone className="w-4 h-4 text-indigo-500" />
+                  <span className="text-sm font-bold">{selectedAreaItem.contacts[0]}</span>
+                  <a href={`tel:${selectedAreaItem.contacts[0]}`} className="ml-auto p-2 bg-indigo-50 text-indigo-600 rounded-lg"><PhoneCall className="w-4 h-4" /></a>
+                </div>
+              )}
             </div>
+
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">বিস্তারিত</h4>
             <p className="text-gray-600 text-sm leading-relaxed mb-10">{selectedAreaItem.description}</p>
           </div>
         </div>
