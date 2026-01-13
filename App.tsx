@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, WifiOff,
-  Clock, ChevronDown, LayoutGrid
+  Clock, ChevronDown, LayoutGrid, List
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
@@ -94,7 +94,6 @@ const DATA: AreaInfo[] = [
 
 const ImageSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  
   const sliderImages = useMemo(() => {
     return [...DATA]
       .filter(item => !!item.imageUrl)
@@ -115,28 +114,65 @@ const ImageSlider: React.FC = () => {
 
   return (
     <div className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl mb-6 shadow-sm border border-gray-100 pointer-events-none">
-      <div 
-        className="flex transition-transform duration-700 ease-in-out h-full"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
+      <div className="flex transition-transform duration-700 ease-in-out h-full" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
         {sliderImages.map((img, idx) => (
-          <img 
-            key={idx} 
-            src={img} 
-            className="w-full h-full object-cover shrink-0" 
-            alt="Slider" 
-          />
+          <img key={idx} src={img} className="w-full h-full object-cover shrink-0" alt="Slider" />
         ))}
       </div>
-      {/* স্লাইডার ইন্ডিকেটর (বিন্দুগুলো) */}
       <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
         {sliderImages.map((_, idx) => (
-          <div 
-            key={idx} 
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentIndex === idx ? 'bg-white w-4' : 'bg-white/40'}`} 
-          />
+          <div key={idx} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${currentIndex === idx ? 'bg-white w-4' : 'bg-white/40'}`} />
         ))}
       </div>
+    </div>
+  );
+};
+
+// ক্যাটাগরি ডেটাবেস ভিউ কম্পোনেন্ট
+const CategoryListView: React.FC<{
+  category: string;
+  data: AreaInfo[];
+  goBack: () => void;
+}> = ({ category, data, goBack }) => {
+  return (
+    <div className="fixed inset-0 z-50 bg-gray-50 overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
+      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4">
+        <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
+          <ArrowLeft className="w-6 h-6 text-gray-600" />
+        </button>
+        <div>
+          <h2 className="text-lg font-bold text-gray-800">{category}</h2>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">তথ্য ভাণ্ডার ({data.length})</p>
+        </div>
+      </header>
+      
+      <main className="max-w-md mx-auto p-4 space-y-3 pb-20">
+        {data.length > 0 ? data.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex gap-4 pointer-events-none">
+            {item.imageUrl && (
+              <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50">
+                <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-gray-800 truncate">{item.title}</h3>
+              <div className="flex items-center gap-1 mt-1">
+                <MapPin className="w-3 h-3 text-indigo-400" />
+                <p className="text-[11px] text-gray-500 truncate">{item.area}</p>
+              </div>
+              <div className="flex items-center gap-1 mt-1.5">
+                <PhoneCall className="w-3 h-3 text-emerald-500" />
+                <p className="text-[11px] font-bold text-gray-700">{item.contacts[0]}</p>
+              </div>
+            </div>
+          </div>
+        )) : (
+          <div className="py-20 text-center">
+            <List className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+            <p className="text-sm text-gray-400">কোনো তথ্য নেই</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
@@ -144,14 +180,13 @@ const ImageSlider: React.FC = () => {
 interface HomeViewProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  selectedCategory: Category | 'সব';
-  setSelectedCategory: (cat: Category | 'সব') => void;
   showSavedOnly: boolean;
   setShowSavedOnly: (val: boolean) => void;
   visibleData: AreaInfo[];
   loadMore: () => void;
   hasMore: boolean;
   navigateToAreaItem: (item: AreaInfo) => void;
+  onCategoryClick: (cat: Category) => void;
   toggleSave: (e: React.MouseEvent, id: string) => void;
   savedIds: string[];
   isOffline: boolean;
@@ -159,9 +194,8 @@ interface HomeViewProps {
 }
 
 const HomeView: React.FC<HomeViewProps> = ({ 
-  searchTerm, setSearchTerm, selectedCategory, setSelectedCategory,
-  showSavedOnly, setShowSavedOnly, visibleData, loadMore, hasMore,
-  navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout 
+  searchTerm, setSearchTerm, showSavedOnly, setShowSavedOnly, visibleData, 
+  loadMore, hasMore, navigateToAreaItem, onCategoryClick, toggleSave, savedIds, isOffline, openAbout 
 }) => {
   return (
     <>
@@ -180,53 +214,26 @@ const HomeView: React.FC<HomeViewProps> = ({
               আমার পাবনা
             </h1>
             <div className="flex gap-2">
-              <button 
-                onClick={() => setShowSavedOnly(!showSavedOnly)}
-                className={`p-2.5 rounded-xl transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
-              >
+              <button onClick={() => setShowSavedOnly(!showSavedOnly)} className={`p-2.5 rounded-xl transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
                 <Heart className={`w-5 h-5 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
               </button>
-              <button 
-                onClick={openAbout}
-                className="p-2.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-xl"
-              >
+              <button onClick={openAbout} className="p-2.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-xl">
                 <Info className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* অটো ইমেজ স্লাইডার (১৬:৯) */}
           <ImageSlider />
 
-          {/* ক্যাটাগরি গ্রিড */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <LayoutGrid className="w-4 h-4 text-indigo-500" />
-                ক্যাটাগরি ভিত্তিক সেবা
-              </h2>
-              {selectedCategory !== 'সব' && (
-                <button 
-                  onClick={() => setSelectedCategory('সব')}
-                  className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md"
-                >
-                  সব ক্যাটাগরি
-                </button>
-              )}
-            </div>
-            
+            <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
+              <LayoutGrid className="w-4 h-4 text-indigo-500" />
+              ক্যাটাগরি ভিত্তিক সেবা
+            </h2>
             <div className="grid grid-cols-2 gap-3">
               {CATEGORY_DATA.map((cat) => (
-                <div 
-                  key={cat.name}
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={`relative group h-24 rounded-2xl overflow-hidden cursor-pointer transition-all border-2 ${selectedCategory === cat.name ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-transparent shadow-sm'}`}
-                >
-                  <img 
-                    src={cat.img} 
-                    className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" 
-                    alt={cat.name} 
-                  />
+                <div key={cat.name} onClick={() => onCategoryClick(cat.name as Category)} className="relative group h-24 rounded-2xl overflow-hidden cursor-pointer transition-all border-transparent shadow-sm hover:ring-4 hover:ring-indigo-50 active:scale-[0.98]">
+                  <img src={cat.img} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" alt={cat.name} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-2 left-2 right-2">
                     <p className="text-[11px] font-bold text-white text-center drop-shadow-md">{cat.name}</p>
@@ -236,49 +243,26 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* সার্চ বক্স */}
           <div className="relative mb-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder={`${selectedCategory === 'সব' ? 'যেকোনো' : selectedCategory} সেবা খুঁজুন...`}
-              className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm font-medium shadow-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400">
-                <X className="w-4 h-4" />
-              </button>
-            )}
+            <input type="text" placeholder="যেকোনো সেবা খুঁজুন..." className="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm font-medium shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-400"><X className="w-4 h-4" /></button>}
           </div>
         </div>
       </header>
 
       <main className="max-w-md mx-auto px-4 mt-6">
         <div className="flex items-center justify-between mb-4 px-1">
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-            {selectedCategory === 'সব' ? 'সাম্প্রতিক তথ্য' : `${selectedCategory} রেজাল্ট`}
-          </h2>
-          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-            {visibleData.length} টি তথ্য
-          </span>
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">সাম্প্রতিক তথ্য</h2>
+          <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{visibleData.length} টি তথ্য</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 pb-8">
           {visibleData.length > 0 ? visibleData.map((item) => (
-            <div 
-              key={item.id} 
-              onClick={() => navigateToAreaItem(item)} 
-              className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-indigo-200 transition-all cursor-pointer active:scale-[0.98] relative"
-            >
-              <button 
-                onClick={(e) => toggleSave(e, item.id)}
-                className="absolute top-2 right-2 z-10 p-2 bg-white/60 backdrop-blur-md rounded-xl shadow-sm border border-white/40"
-              >
+            <div key={item.id} onClick={() => navigateToAreaItem(item)} className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:border-indigo-200 transition-all cursor-pointer active:scale-[0.98] relative">
+              <button onClick={(e) => toggleSave(e, item.id)} className="absolute top-2 right-2 z-10 p-2 bg-white/60 backdrop-blur-md rounded-xl shadow-sm border border-white/40">
                 <Heart className={`w-3.5 h-3.5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-400'}`} />
               </button>
-              
               {item.imageUrl && (
                 <div className="aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" loading="lazy" />
@@ -298,23 +282,14 @@ const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
                 <Search className="w-10 h-10 text-gray-200" />
               </div>
-              <p className="text-sm text-gray-400 font-medium">এই ক্যাটাগরিতে কোনো তথ্য পাওয়া যায়নি</p>
-              <button 
-                onClick={() => setSelectedCategory('সব')}
-                className="text-xs font-bold text-indigo-600 underline"
-              >
-                সব ক্যাটাগরি দেখুন
-              </button>
+              <p className="text-sm text-gray-400 font-medium">কিছু পাওয়া যায়নি</p>
             </div>
           )}
         </div>
 
         {hasMore && (
           <div className="pb-28">
-            <button 
-              onClick={loadMore}
-              className="w-full py-4 bg-white border border-indigo-100 rounded-2xl text-indigo-600 text-sm font-bold shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]"
-            >
+            <button onClick={loadMore} className="w-full py-4 bg-white border border-indigo-100 rounded-2xl text-indigo-600 text-sm font-bold shadow-sm flex items-center justify-center gap-2 active:scale-[0.98]">
               আরও দেখুন <ChevronDown className="w-4 h-4" />
             </button>
           </div>
@@ -324,58 +299,30 @@ const HomeView: React.FC<HomeViewProps> = ({
   );
 };
 
-const DetailView: React.FC<{ 
-  item: AreaInfo; 
-  goBack: () => void; 
-  toggleSave: (e: React.MouseEvent, id: string) => void; 
-  savedIds: string[]; 
-  handleCopy: (text: string) => void; 
-  copiedText: string | null; 
-  openInMaps: (addr: string) => void; 
-}> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => {
+const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e: React.MouseEvent, id: string) => void; savedIds: string[]; handleCopy: (text: string) => void; copiedText: string | null; openInMaps: (addr: string) => void; }> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => {
   const getRelativeTime = (ts: number) => {
     const diff = Date.now() - ts;
     const toBn = (num: number) => num.toLocaleString('bn-BD');
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-
     if (minutes < 60) return `${toBn(minutes)} মিনিট আগে`;
     if (hours < 24) return `${toBn(hours)} ঘণ্টা আগে`;
     return `${toBn(days)} দিন আগে`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top safe-bottom">
+    <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top">
       <div className="relative aspect-[4/3] w-full max-w-md mx-auto bg-gray-100">
         <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
-        <div className="absolute top-4 left-4">
-          <button onClick={goBack} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="absolute top-4 right-4">
-          <button onClick={(e) => toggleSave(e, item.id)} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
-            <Heart className={`w-5 h-5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
-          </button>
-        </div>
+        <div className="absolute top-4 left-4"><button onClick={goBack} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20"><ArrowLeft className="w-5 h-5" /></button></div>
+        <div className="absolute top-4 right-4"><button onClick={(e) => toggleSave(e, item.id)} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20"><Heart className={`w-5 h-5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : ''}`} /></button></div>
       </div>
-      
       <div className="p-6 max-w-md mx-auto">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
-          <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-lg">{item.area}</span>
-        </div>
-        
+        <div className="flex items-center gap-2 mb-3"><span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span><span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-lg">{item.area}</span></div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2 leading-tight tracking-tight">{item.title}</h2>
-        
-        <div className="flex items-center gap-1.5 mb-8 opacity-60">
-          <Clock className="w-3.5 h-3.5 text-indigo-500" />
-          <span className="text-[11px] text-gray-500 font-bold">আপডেট: {getRelativeTime(item.timestamp)}</span>
-        </div>
-        
+        <div className="flex items-center gap-1.5 mb-8 opacity-60"><Clock className="w-3.5 h-3.5 text-indigo-500" /><span className="text-[11px] text-gray-500 font-bold">আপডেট: {getRelativeTime(item.timestamp)}</span></div>
         <p className="text-gray-600 text-sm leading-relaxed mb-10 whitespace-pre-wrap">{item.description}</p>
-        
         <div className="space-y-8 pb-12">
           <section className="space-y-4">
             <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">যোগাযোগ</h4>
@@ -383,15 +330,12 @@ const DetailView: React.FC<{
               <div key={idx} className="flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-3xl border border-gray-100">
                 <p className="text-sm text-gray-800 font-bold">{num.toLocaleString('bn-BD')}</p>
                 <div className="flex gap-2">
-                  <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
-                    {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
+                  <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>{copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}</button>
                   <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-md"><PhoneCall className="w-4 h-4" /></a>
                 </div>
               </div>
             ))}
           </section>
-
           <section className="space-y-4">
             <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">ঠিকানা</h4>
             {item.addresses.map((addr, idx) => (
@@ -408,38 +352,16 @@ const DetailView: React.FC<{
 };
 
 const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
-  <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
-    <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4">
-      <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
-        <ArrowLeft className="w-6 h-6 text-gray-600" />
-      </button>
-      <h2 className="text-lg font-bold text-gray-800">অ্যাপ তথ্য</h2>
-    </header>
+  <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
+    <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4"><button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all"><ArrowLeft className="w-6 h-6 text-gray-600" /></button><h2 className="text-lg font-bold text-gray-800">অ্যাপ তথ্য</h2></header>
     <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
-      <div className="text-center py-10 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm">
-        <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-4">
-          <MapPin className="w-10 h-10 text-white" />
-        </div>
-        <h3 className="text-2xl font-bold text-gray-800">আমার পাবনা</h3>
-        <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৩.২ (স্লাইডার)</p>
-      </div>
-      <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার</h4>
-        <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm border border-gray-50">
-            <img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <h5 className="font-bold text-gray-800">মীর রাব্বি হোসেন</h5>
-            <p className="text-xs text-indigo-600 font-bold">পাবনা জেলা, বাংলাদেশ</p>
-          </div>
-        </div>
-      </section>
+      <div className="text-center py-10 bg-white rounded-[2.5rem] border border-gray-100 shadow-sm"><div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-4"><MapPin className="w-10 h-10 text-white" /></div><h3 className="text-2xl font-bold text-gray-800">আমার পাবনা</h3><p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৩.৫ (ডেটাবেস ভিউ)</p></div>
+      <section className="space-y-4"><h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার</h4><div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4"><div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm border border-gray-50"><img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" /></div><div><h5 className="font-bold text-gray-800">মীর রাব্বি হোসেন</h5><p className="text-xs text-indigo-600 font-bold">পাবনা জেলা, বাংলাদেশ</p></div></div></section>
     </main>
   </div>
 );
 
-type ViewState = 'home' | 'area-detail' | 'about';
+type ViewState = 'home' | 'area-detail' | 'about' | 'category-list';
 const ITEMS_PER_PAGE = 20;
 
 const App: React.FC = () => {
@@ -460,10 +382,7 @@ const App: React.FC = () => {
     window.addEventListener('offline', handleOffline);
     const stored = localStorage.getItem('amar_pabna_saved');
     if (stored) { try { setSavedIds(JSON.parse(stored)); } catch (e) {} }
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
+    return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
   }, []);
 
   useEffect(() => { localStorage.setItem('amar_pabna_saved', JSON.stringify(savedIds)); }, [savedIds]);
@@ -471,21 +390,15 @@ const App: React.FC = () => {
   const filteredData = useMemo(() => {
     const str = searchTerm.toLowerCase();
     return DATA.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(str) || 
-                           item.description.toLowerCase().includes(str) ||
-                           item.area.toLowerCase().includes(str) ||
-                           item.upazila.toLowerCase().includes(str) ||
-                           item.addresses.some(a => a.toLowerCase().includes(str)) ||
-                           item.contacts.some(c => c.toLowerCase().includes(str));
-                           
+      const matchesSearch = item.title.toLowerCase().includes(str) || item.description.toLowerCase().includes(str) || item.area.toLowerCase().includes(str) || item.upazila.toLowerCase().includes(str) || item.addresses.some(a => a.toLowerCase().includes(str)) || item.contacts.some(c => c.toLowerCase().includes(str));
       const matchesCategory = selectedCategory === 'সব' || item.category === selectedCategory;
       const matchesSaved = !showSavedOnly || savedIds.includes(item.id);
-      
       return matchesSearch && matchesCategory && matchesSaved;
     }).sort((a, b) => b.timestamp - a.timestamp);
   }, [searchTerm, selectedCategory, showSavedOnly, savedIds]);
 
   const visibleData = useMemo(() => filteredData.slice(0, visibleCount), [filteredData, visibleCount]);
+  const categorySpecificData = useMemo(() => DATA.filter(item => item.category === selectedCategory), [selectedCategory]);
 
   useEffect(() => { setVisibleCount(ITEMS_PER_PAGE); }, [searchTerm, selectedCategory, showSavedOnly]);
 
@@ -494,23 +407,19 @@ const App: React.FC = () => {
       {currentView === 'home' && (
         <HomeView 
           searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-          selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
           showSavedOnly={showSavedOnly} setShowSavedOnly={setShowSavedOnly}
-          visibleData={visibleData} 
-          loadMore={() => setVisibleCount(v => v + ITEMS_PER_PAGE)}
-          hasMore={visibleCount < filteredData.length}
+          visibleData={visibleData} loadMore={() => setVisibleCount(v => v + ITEMS_PER_PAGE)} hasMore={visibleCount < filteredData.length}
+          onCategoryClick={(cat) => { setSelectedCategory(cat); setCurrentView('category-list'); window.scrollTo({ top: 0 }); }}
           navigateToAreaItem={(item) => { setSelectedAreaItem(item); setCurrentView('area-detail'); window.scrollTo({ top: 0 }); }}
           toggleSave={(e, id) => { e.stopPropagation(); setSavedIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); }}
-          savedIds={savedIds} isOffline={isOffline}
-          openAbout={() => setCurrentView('about')}
+          savedIds={savedIds} isOffline={isOffline} openAbout={() => setCurrentView('about')}
         />
       )}
+      {currentView === 'category-list' && (
+        <CategoryListView category={selectedCategory} data={categorySpecificData} goBack={() => { setCurrentView('home'); setSelectedCategory('সব'); }} />
+      )}
       {currentView === 'area-detail' && selectedAreaItem && (
-        <DetailView 
-          item={selectedAreaItem} goBack={() => setCurrentView('home')} toggleSave={(e, id) => { e.stopPropagation(); setSavedIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); }}
-          savedIds={savedIds} handleCopy={(t) => { navigator.clipboard.writeText(t); setCopiedText(t); setTimeout(() => setCopiedText(null), 2000); }} 
-          copiedText={copiedText} openInMaps={(a) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`, '_blank')}
-        />
+        <DetailView item={selectedAreaItem} goBack={() => setCurrentView('home')} toggleSave={(e, id) => { e.stopPropagation(); setSavedIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); }} savedIds={savedIds} handleCopy={(t) => { navigator.clipboard.writeText(t); setCopiedText(t); setTimeout(() => setCopiedText(null), 2000); }} copiedText={copiedText} openInMaps={(a) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`, '_blank')} />
       )}
       {currentView === 'about' && <AboutView goBack={() => setCurrentView('home')} />}
     </div>
