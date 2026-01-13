@@ -25,6 +25,8 @@ export interface AreaInfo {
   title: string;
   category: Category;
   description: string;
+  upazila: string;
+  area: string;
   addresses: string[];
   contacts: string[];
   imageUrl?: string;
