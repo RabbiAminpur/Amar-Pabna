@@ -10,6 +10,18 @@ import { AreaInfo, Category, SocialLink } from './types.ts';
 
 const DATA: AreaInfo[] = [
   {
+    id: '6',
+    title: 'হোটেল নুর, কাশিনাথপুর',
+    category: Category.HOTEL,
+    description: 'কাশিনাথপুর এলাকার একটি আধুনিক আবাসিক হোটেল। এখানে উন্নত মানের এসি (AC) এবং নন-এসি রুমের ব্যবস্থা রয়েছে। ভ্রমণকারী বা ব্যবসায়িক প্রয়োজনে আসা মেহমানদের জন্য এটি একটি নিরাপদ ও আরামদায়ক আবাসন। হোটেলের নিচেই প্রয়োজনীয় বাজার ও যাতায়াতের সুব্যবস্থা রয়েছে।',
+    addresses: ['নুর প্লাজা, কাশিনাথপুর ফুলবাগান ট্রাফিক মোড়, আমিনপুর, পাবনা', 'XJ54+CR Kashinathpur, Bangladesh'],
+    contacts: ['01775142831'],
+    imageUrl: 'https://i.ibb.co/1Gy7sVSb/IMG-20260113-222912.jpg',
+    addedBy: 'মীর রাব্বি হোসেন',
+    timestamp: Date.now(),
+    socialLinks: []
+  },
+  {
     id: '1',
     title: '২৫০ শয্যা বিশিষ্ট জেনারেল হাসপাতাল, পাবনা',
     category: Category.HEALTH,
@@ -18,7 +30,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01730324813', '01733077774', '02588843333'],
     imageUrl: 'https://i.ibb.co/0yPD7HCp/598424785-1267135282105126-1687972329689254049-n.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now(), 
+    timestamp: 1714000000000, 
     socialLinks: [
       { platform: 'facebook', url: 'https://www.facebook.com/250ghppabna/' },
       { platform: 'website', url: 'https://hospital.pabna.gov.bd/bn' }
@@ -37,7 +49,7 @@ const DATA: AreaInfo[] = [
     ],
     imageUrl: 'https://i.ibb.co/b5XrFJxp/266762814-208341711466108-9127291067624475523-n.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now(),
+    timestamp: 1713000000000,
     socialLinks: [
       { platform: 'facebook', url: 'https://www.facebook.com/PabnaExpress/' }
     ]
@@ -55,7 +67,7 @@ const DATA: AreaInfo[] = [
     ],
     imageUrl: 'https://i.ibb.co/rRSZ4F4Q/images.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now(),
+    timestamp: 1712000000000,
     socialLinks: [
       { platform: 'facebook', url: 'https://www.facebook.com/PabnaExpress/' }
     ]
@@ -67,9 +79,9 @@ const DATA: AreaInfo[] = [
     description: 'সেরা বিরিয়ানি এবং ঘরোয়া খাবার পাওয়া যায়। পরিচ্ছন্ন পরিবেশ এবং উন্নত মানের সার্ভিস।',
     addresses: ['আব্দুল হামিদ রোড, পাবনা', 'শাখা ২: ট্রাফিক মোড়'],
     contacts: ['01822334455', '01311223344'],
-    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1000',
+    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&get=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now() - 1000 * 60 * 60 * 3, 
+    timestamp: 1711000000000, 
     socialLinks: [
       { platform: 'facebook', url: 'https://facebook.com/mayerdoa.pabna' }
     ]
@@ -83,7 +95,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01555555555', '01444444444'],
     imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2 
+    timestamp: 1710000000000 
   }
 ];
 
@@ -280,6 +292,9 @@ const DetailView: React.FC<{
         '01799624882': 'চান্দুরা'
       };
       return labels[num] || 'ঢাকা কাউন্টার নম্বর';
+    }
+    if (itemId === '6') {
+      return 'রিসিপশন ফোন';
     }
     return 'যোগাযোগ নম্বর';
   };
