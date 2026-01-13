@@ -15,6 +15,11 @@ export enum Category {
   OTHER = 'অন্যান্য'
 }
 
+export interface SocialLink {
+  platform: 'facebook' | 'whatsapp' | 'website' | 'other';
+  url: string;
+}
+
 export interface AreaInfo {
   id: string;
   title: string;
@@ -25,4 +30,5 @@ export interface AreaInfo {
   imageUrl?: string;
   addedBy: string;
   timestamp: number;
+  socialLinks?: SocialLink[];
 }

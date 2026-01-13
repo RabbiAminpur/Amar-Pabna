@@ -3,9 +3,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Phone, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, Bookmark, WifiOff,
-  User, ShieldCheck, HelpCircle, Code, GraduationCap, Globe, Facebook, MessageCircle, Edit3
+  User, ShieldCheck, HelpCircle, Code, GraduationCap, Globe, Facebook, MessageCircle, Edit3, Clock, Link as LinkIcon
 } from 'lucide-react';
-import { AreaInfo, Category } from './types.ts';
+import { AreaInfo, Category, SocialLink } from './types.ts';
 
 const DATA: AreaInfo[] = [
   {
@@ -17,7 +17,11 @@ const DATA: AreaInfo[] = [
     contacts: ['01711223344', '01911556677'],
     imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715000000000
+    timestamp: 1715000000000,
+    socialLinks: [
+      { platform: 'facebook', url: 'https://facebook.com/pabnahospital' },
+      { platform: 'website', url: 'https://pabnahospital.gov.bd' }
+    ]
   },
   {
     id: '2',
@@ -28,7 +32,10 @@ const DATA: AreaInfo[] = [
     contacts: ['01822334455', '01311223344'],
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715100000000
+    timestamp: 1715100000000,
+    socialLinks: [
+      { platform: 'facebook', url: 'https://facebook.com/mayerdoa.pabna' }
+    ]
   },
   {
     id: '3',
@@ -186,12 +193,6 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
         ))}
-        {filteredData.length === 0 && (
-          <div className="col-span-2 text-center py-20 opacity-30">
-            <Search className="w-12 h-12 mx-auto mb-2" />
-            <p className="text-sm">কোনো তথ্য পাওয়া যায়নি</p>
-          </div>
-        )}
       </div>
     </main>
   </>
@@ -205,76 +206,126 @@ const DetailView: React.FC<{
   handleCopy: (text: string) => void; 
   copiedText: string | null; 
   openInMaps: (addr: string) => void; 
-}> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => (
-  <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top safe-bottom">
-    <div className="relative aspect-video w-full max-w-md mx-auto bg-gray-100 shadow-lg">
-      <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
-      <div className="absolute top-4 left-4 flex gap-2">
-        <button onClick={goBack} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+}> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => {
+  const getSocialIcon = (platform: string) => {
+    switch(platform) {
+      case 'facebook': return <Facebook className="w-5 h-5" />;
+      case 'whatsapp': return <MessageCircle className="w-5 h-5" />;
+      default: return <LinkIcon className="w-5 h-5" />;
+    }
+  };
+
+  const formatTimestamp = (ts: number) => {
+    return new Intl.DateTimeFormat('bn-BD', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }).format(new Date(ts));
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top safe-bottom">
+      <div className="relative aspect-video w-full max-w-md mx-auto bg-gray-100 shadow-lg">
+        <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
+        <div className="absolute top-4 left-4 flex gap-2">
+          <button onClick={goBack} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="absolute top-4 right-4">
+          <button onClick={(e) => toggleSave(e, item.id)} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
+            <Heart className={`w-5 h-5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+          </button>
+        </div>
       </div>
-      <div className="absolute top-4 right-4">
-        <button onClick={(e) => toggleSave(e, item.id)} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
-          <Heart className={`w-5 h-5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
-        </button>
-      </div>
-    </div>
-    
-    <div className="p-6 max-w-md mx-auto">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
-      </div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight">{item.title}</h2>
-      <p className="text-gray-600 text-sm leading-relaxed mb-10 whitespace-pre-wrap">{item.description}</p>
       
-      <div className="space-y-8 pb-10">
-        <section className="space-y-4">
-          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">যোগাযোগ নম্বর</h4>
-          {item.contacts.map((num, idx) => (
-            <div key={idx} className="flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-3xl border border-gray-100">
-              <p className="text-sm text-gray-800 font-bold">{num}</p>
-              <div className="flex gap-2">
-                <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
-                  {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </button>
-                <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-md"><PhoneCall className="w-4 h-4" /></a>
+      <div className="p-6 max-w-md mx-auto">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight">{item.title}</h2>
+        <p className="text-gray-600 text-sm leading-relaxed mb-10 whitespace-pre-wrap">{item.description}</p>
+        
+        <div className="space-y-8 pb-10">
+          {/* Social Links Section */}
+          {item.socialLinks && item.socialLinks.length > 0 && (
+            <section className="space-y-4">
+              <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">সামাজিক মাধ্যম</h4>
+              <div className="flex flex-wrap gap-3">
+                {item.socialLinks.map((link, idx) => (
+                  <a 
+                    key={idx} 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-indigo-100 shadow-sm"
+                  >
+                    {getSocialIcon(link.platform)}
+                    <span className="capitalize">{link.platform}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="space-y-4">
+            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">যোগাযোগ নম্বর</h4>
+            {item.contacts.map((num, idx) => (
+              <div key={idx} className="flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-3xl border border-gray-100">
+                <p className="text-sm text-gray-800 font-bold">{num}</p>
+                <div className="flex gap-2">
+                  <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
+                    {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-md"><PhoneCall className="w-4 h-4" /></a>
+                </div>
+              </div>
+            ))}
+          </section>
+
+          <section className="space-y-4">
+            <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">বিস্তারিত ঠিকানা</h4>
+            {item.addresses.map((addr, idx) => (
+              <div key={idx} className="flex items-center justify-between gap-3 bg-indigo-50/20 p-4 rounded-3xl border border-indigo-50">
+                <p className="text-sm text-gray-700 font-medium leading-relaxed">{addr}</p>
+                <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-white text-indigo-600 rounded-2xl border border-indigo-100 shadow-sm"><ExternalLink className="w-4 h-4" /></button>
+              </div>
+            ))}
+          </section>
+
+          {/* Collector Note Section with Image and Updated Timestamp */}
+          <section className="mt-12 pt-8 border-t border-dashed border-gray-200">
+            <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-white shrink-0">
+                  <img 
+                    src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" 
+                    alt="Mir Rabbi Hossain" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">তথ্য সংগ্রহকারী</p>
+                  <p className="text-sm font-bold text-gray-700">মীর রাব্বি হোসেন</p>
+                </div>
               </div>
             </div>
-          ))}
-        </section>
-
-        <section className="space-y-4">
-          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">বিস্তারিত ঠিকানা</h4>
-          {item.addresses.map((addr, idx) => (
-            <div key={idx} className="flex items-center justify-between gap-3 bg-indigo-50/20 p-4 rounded-3xl border border-indigo-50">
-              <p className="text-sm text-gray-700 font-medium leading-relaxed">{addr}</p>
-              <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-white text-indigo-600 rounded-2xl border border-indigo-100 shadow-sm"><ExternalLink className="w-4 h-4" /></button>
+            
+            <div className="mt-6 flex flex-col items-center gap-1.5 opacity-60">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <Clock className="w-3 h-3" /> সর্বশেষ আপডেট
+              </div>
+              <p className="text-[11px] text-gray-500 font-medium">{formatTimestamp(item.timestamp)}</p>
             </div>
-          ))}
-        </section>
-
-        {/* Collector Note Section with Image */}
-        <section className="mt-12 pt-8 border-t border-dashed border-gray-200">
-          <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-white shrink-0">
-              <img 
-                src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" 
-                alt="Mir Rabbi Hossain" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">তথ্য সংগ্রহকারী</p>
-              <p className="text-sm font-bold text-gray-700">মীর রাব্বি হোসেন</p>
-            </div>
-          </div>
-          <p className="text-[10px] text-gray-300 text-center mt-6">সর্বশেষ আপডেট: {new Date(item.timestamp).toLocaleDateString('bn-BD')}</p>
-        </section>
+          </section>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
   <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
