@@ -11,17 +11,17 @@ import { AreaInfo, Category, SocialLink } from './types.ts';
 const DATA: AreaInfo[] = [
   {
     id: '1',
-    title: 'পাবনা জেনারেল হাসপাতাল',
+    title: '২৫০ শয্যা বিশিষ্ট জেনারেল হাসপাতাল, পাবনা',
     category: Category.HEALTH,
-    description: 'এখানকার ইমার্জেন্সি সার্ভিস ২৪ ঘণ্টা খোলা থাকে। অত্যন্ত আধুনিক চিকিৎসা ব্যবস্থা এবং বিশেষজ্ঞ ডাক্তারদের পরামর্শ পাওয়া যায়।',
-    addresses: ['হাসপাতাল রোড, পাবনা সদর', 'জরুরি গেট, পশ্চিম পাশ'],
-    contacts: ['01711223344', '01911556677'],
-    imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000',
+    description: 'পাবনা জেলার প্রধান সরকারি চিকিৎসা কেন্দ্র। এখানে ২৫০ শয্যার আধুনিক চিকিৎসা সুবিধা রয়েছে। ২৪ ঘণ্টা জরুরি বিভাগ, প্যাথলজি, এক্স-রে এবং অপারেশন থিয়েটার সেবা চালু থাকে। বিশেষজ্ঞ ডাক্তারদের তত্ত্বাবধানে মেডিসিন, সার্জারি, গাইনি, শিশু রোগ এবং কার্ডিওলজি ইউনিট পরিচালিত হয়। সরকারি সাশ্রয়ী মূল্যে আধুনিক স্বাস্থ্যসেবা নিশ্চিত করাই এই হাসপাতালের মূল লক্ষ্য।',
+    addresses: ['268V+MQ Pabna, Bangladesh', 'হাসপাতাল রোড, পাবনা সদর'],
+    contacts: ['01730324813', '01733077774', '02588843333'],
+    imageUrl: 'https://i.ibb.co/0yPD7HCp/598424785-1267135282105126-1687972329689254049-n.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now() - 1000 * 60 * 45, // 45 mins ago for demo
+    timestamp: Date.now(), 
     socialLinks: [
-      { platform: 'facebook', url: 'https://facebook.com/pabnahospital' },
-      { platform: 'website', url: 'https://pabnahospital.gov.bd' }
+      { platform: 'facebook', url: 'https://www.facebook.com/250ghppabna/' },
+      { platform: 'website', url: 'https://hospital.pabna.gov.bd/bn' }
     ]
   },
   {
@@ -33,7 +33,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01822334455', '01311223344'],
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now() - 1000 * 60 * 60 * 3, // 3 hours ago for demo
+    timestamp: Date.now() - 1000 * 60 * 60 * 3, 
     socialLinks: [
       { platform: 'facebook', url: 'https://facebook.com/mayerdoa.pabna' }
     ]
@@ -47,7 +47,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01555555555', '01444444444'],
     imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2 // 2 days ago for demo
+    timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2 
   }
 ];
 
@@ -204,6 +204,15 @@ const DetailView: React.FC<{
     }).format(new Date(ts));
   };
 
+  const getContactLabel = (num: string, itemId: string) => {
+    if (itemId === '1') {
+      if (num === '01730324813') return 'মোবাইল সার্ভিস';
+      if (num === '01733077774') return 'এসএমএস অভিযোগ';
+      if (num === '02588843333') return 'এ্যাম্বুলেন্স সার্ভিস';
+    }
+    return 'যোগাযোগ নম্বর';
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top safe-bottom">
       <div className="relative aspect-video w-full max-w-md mx-auto bg-gray-100 shadow-lg">
@@ -258,13 +267,16 @@ const DetailView: React.FC<{
           <section className="space-y-4">
             <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">যোগাযোগ নম্বর</h4>
             {item.contacts.map((num, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                <p className="text-sm text-gray-800 font-bold">{num}</p>
-                <div className="flex gap-2">
-                  <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
-                    {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-md"><PhoneCall className="w-4 h-4" /></a>
+              <div key={idx} className="flex flex-col gap-2 bg-gray-50 p-4 rounded-3xl border border-gray-100">
+                <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wide">{getContactLabel(num, item.id)}</span>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm text-gray-800 font-bold">{num.toLocaleString('bn-BD')}</p>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
+                      {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-md"><PhoneCall className="w-4 h-4" /></a>
+                  </div>
                 </div>
               </div>
             ))}
@@ -355,7 +367,6 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => {
           <p className="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ১.০.০ (বেটা)</p>
         </div>
 
-        {/* Expanded Usage Guide Section */}
         <section className="space-y-4">
           <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
             <HelpCircle className="w-4 h-4 text-indigo-500" /> পূর্ণাঙ্গ ব্যবহার বিধি
