@@ -12,6 +12,8 @@ export enum Category {
   AMBULANCE = 'অ্যাম্বুলেন্স সার্ভিস',
   FIRE_SERVICE = 'ফায়ার সার্ভিস',
   BLOOD_BANK = 'ব্লাড ব্যাংক',
+  TOURIST_SPOT = 'দর্শনীয় স্থান',
+  ANCIENT_ARCH = 'প্রাচীন স্থাপত্য',
   OTHER = 'অন্যান্য'
 }
 
@@ -30,6 +32,8 @@ export interface AreaInfo {
   addresses: string[];
   contacts: string[];
   imageUrl?: string;
+  galleryImages?: string[];
+  howToGo?: string;
   addedBy: string;
   timestamp: number;
   socialLinks?: SocialLink[];
