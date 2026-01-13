@@ -17,7 +17,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01711223344', '01911556677'],
     imageUrl: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715000000000,
+    timestamp: Date.now() - 1000 * 60 * 45, // 45 mins ago for demo
     socialLinks: [
       { platform: 'facebook', url: 'https://facebook.com/pabnahospital' },
       { platform: 'website', url: 'https://pabnahospital.gov.bd' }
@@ -32,7 +32,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01822334455', '01311223344'],
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715100000000,
+    timestamp: Date.now() - 1000 * 60 * 60 * 3, // 3 hours ago for demo
     socialLinks: [
       { platform: 'facebook', url: 'https://facebook.com/mayerdoa.pabna' }
     ]
@@ -46,40 +46,7 @@ const DATA: AreaInfo[] = [
     contacts: ['01555555555', '01444444444'],
     imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715300000000
-  },
-  {
-    id: '4',
-    title: 'পাবনা সেফ অ্যাম্বুলেন্স',
-    category: Category.AMBULANCE,
-    description: 'আমরা ২৪ ঘণ্টা এসি এবং নন-এসি অ্যাম্বুলেন্স সেবা প্রদান করি। পাবনা সহ সারা দেশে রোগী পরিবহনের সুবিধা রয়েছে।',
-    addresses: ['সদর হাসপাতাল মোড়, পাবনা'],
-    contacts: ['01700000001', '01800000001'],
-    imageUrl: 'https://images.unsplash.com/photo-1587748661673-d15d1c7176a8?auto=format&fit=crop&q=80&w=1000',
-    addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715400000000
-  },
-  {
-    id: '5',
-    title: 'পাবনা ফায়ার স্টেশন',
-    category: Category.FIRE_SERVICE,
-    description: 'যেকোনো অগ্নি দুর্ঘটনা বা উদ্ধার কাজের জন্য জরুরি প্রয়োজনে কল করুন। আমাদের ইউনিট সর্বদা প্রস্তুত।',
-    addresses: ['পাবনা বাইপাস রোড, ফায়ার সার্ভিস মোড়'],
-    contacts: ['16163', '0731-66002'],
-    imageUrl: 'https://images.unsplash.com/photo-1544641014-94c6553a5584?auto=format&fit=crop&q=80&w=1000',
-    addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715500000000
-  },
-  {
-    id: '6',
-    title: 'পাবনা ব্লাড ফাইটারস',
-    category: Category.BLOOD_BANK,
-    description: 'মুমূর্ষু রোগীদের জন্য রক্তের প্রয়োজনে যোগাযোগ করুন। আমাদের একটি বিশাল রক্তদাতা ডাটাবেস রয়েছে।',
-    addresses: ['মা ও শিশু কল্যাণ কেন্দ্র এলাকা, পাবনা'],
-    contacts: ['01611223344', '01511223344'],
-    imageUrl: 'https://images.unsplash.com/photo-1615461066841-6116e61058f4?auto=format&fit=crop&q=80&w=1000',
-    addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1715600000000
+    timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2 // 2 days ago for demo
   }
 ];
 
@@ -215,14 +182,24 @@ const DetailView: React.FC<{
     }
   };
 
-  const formatTimestamp = (ts: number) => {
+  const getRelativeTime = (ts: number) => {
+    const diff = Date.now() - ts;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    const toBn = (num: number) => num.toLocaleString('bn-BD');
+
+    if (seconds < 60) return 'এইমাত্র';
+    if (minutes < 60) return `${toBn(minutes)} মিনিট আগে`;
+    if (hours < 24) return `${toBn(hours)} ঘণ্টা আগে`;
+    if (days < 30) return `${toBn(days)} দিন আগে`;
+    
     return new Intl.DateTimeFormat('bn-BD', {
-      year: 'numeric',
-      month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
+      month: 'long',
+      year: 'numeric'
     }).format(new Date(ts));
   };
 
@@ -243,15 +220,17 @@ const DetailView: React.FC<{
       </div>
       
       <div className="p-6 max-w-md mx-auto">
-        <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2">
           <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
-          {/* Moved Timestamp to the top for better visibility */}
-          <div className="flex items-center gap-1.5 opacity-60">
-            <Clock className="w-3 h-3 text-indigo-400" />
-            <span className="text-[10px] text-gray-500 font-bold">{formatTimestamp(item.timestamp)}</span>
-          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight leading-tight">{item.title}</h2>
+        
+        <h2 className="text-2xl font-bold text-gray-800 mb-2 tracking-tight leading-tight">{item.title}</h2>
+        
+        {/* Real-time Relative Timestamp - Placed below Title */}
+        <div className="flex items-center gap-1.5 mb-6 opacity-60">
+          <Clock className="w-3.5 h-3.5 text-indigo-500" />
+          <span className="text-[11px] text-gray-500 font-bold">সর্বশেষ আপডেট: {getRelativeTime(item.timestamp)}</span>
+        </div>
         
         <p className="text-gray-600 text-sm leading-relaxed mb-10 whitespace-pre-wrap">{item.description}</p>
         
@@ -302,7 +281,7 @@ const DetailView: React.FC<{
             ))}
           </section>
 
-          {/* Collector Note Section (Timestamp removed from here) */}
+          {/* Collector Note Section */}
           <section className="mt-12 pt-8 border-t border-dashed border-gray-200">
             <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -336,7 +315,6 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
     </header>
 
     <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
-      {/* App Branding */}
       <div className="text-center py-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
         <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-100 mb-4">
           <MapPin className="w-10 h-10 text-white" />
@@ -345,7 +323,6 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
         <p className="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ১.০.০ (বেটা)</p>
       </div>
 
-      {/* Developer Section */}
       <section className="space-y-4">
         <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
           <Code className="w-4 h-4 text-indigo-500" /> ডেভেলপার প্রোফাইল
@@ -392,20 +369,10 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-8">
-              <a 
-                href="https://facebook.com/rabbi.aminpur" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-indigo-100"
-              >
+              <a href="https://facebook.com/rabbi.aminpur" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-indigo-100">
                 <Facebook className="w-4 h-4" /> ফেসবুক
               </a>
-              <a 
-                href="https://wa.me/60187698459" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 py-3 bg-green-50 text-green-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-green-100"
-              >
+              <a href="https://wa.me/60187698459" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 py-3 bg-green-50 text-green-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-green-100">
                 <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
               </a>
             </div>
@@ -413,36 +380,12 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
         </div>
       </section>
 
-      {/* Purpose */}
       <section className="space-y-4">
         <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
           <ShieldCheck className="w-4 h-4 text-indigo-500" /> অ্যাপের উদ্দেশ্য
         </h4>
         <div className="bg-white border border-gray-100 p-6 rounded-3xl shadow-sm leading-relaxed text-gray-600 text-sm italic">
-          "আমার পাবনা" একটি অলাভজনক উদ্যোগ। পাবনা জেলার সকল প্রয়োজনীয় এবং জরুরি তথ্য (যেমন: হাসপাতাল, ফায়ার সার্ভিস, অ্যাম্বুলেন্স) খুব সহজে এক জায়গায় মানুষের কাছে পৌঁছে দেওয়াই এই অ্যাপের মূল লক্ষ্য।
-        </div>
-      </section>
-
-      {/* Usage Guide */}
-      <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
-          <HelpCircle className="w-4 h-4 text-indigo-500" /> ব্যবহার বিধি
-        </h4>
-        <div className="grid gap-3">
-          {[
-            'সার্চ বক্সে জায়গার নাম লিখে সার্চ করুন।',
-            'ক্যাটাগরি বাটনগুলোতে ক্লিক করে তথ্য ফিল্টার করুন।',
-            'কল আইকনে ক্লিক করে সরাসরি যোগাযোগ করুন।',
-            'হার্ট আইকনে ক্লিক করে তথ্য সেভ করে রাখুন।',
-            'অ্যাপটি অফলাইন মোডেও ব্যবহার করা যায়।'
-          ].map((text, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl">
-              <div className="w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px]">
-                {i + 1}
-              </div>
-              <p className="text-sm text-gray-600 font-medium">{text}</p>
-            </div>
-          ))}
+          "আমার পাবনা" একটি অলাভজনক উদ্যোগ। পাবনা জেলার সকল প্রয়োজনীয় এবং জরুরি তথ্য খুব সহজে এক জায়গায় মানুষের কাছে পৌঁছে দেওয়াই এই অ্যাপের মূল লক্ষ্য।
         </div>
       </section>
 
