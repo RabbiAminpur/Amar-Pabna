@@ -3,11 +3,12 @@ import {
   Search, MapPin, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, WifiOff,
   Clock, ChevronDown, LayoutGrid, List,
-  Stethoscope, Bus, Siren, Hotel, ChevronRight
+  Stethoscope, Bus, Siren, Hotel, ChevronRight,
+  Flame, ShieldAlert, Phone
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
-// হিরো সেকশনের ৪টি প্রধান ক্যাটাগরি কনফিগ এনিমেশন সহ
+// হিরো সেকশনের প্রধান ক্যাটাগরি কনফিগ
 const HERO_CATEGORIES = [
   { 
     name: Category.HEALTH, 
@@ -28,7 +29,7 @@ const HERO_CATEGORIES = [
     anim: 'animate-float'
   },
   { 
-    name: Category.AMBULANCE, 
+    name: 'EMERGENCY_HUB', 
     label: 'ইমার্জেন্সি সার্ভিস', 
     icon: Siren, 
     color: 'bg-rose-500', 
@@ -81,44 +82,126 @@ const DATA: AreaInfo[] = [
   },
   {
     id: '5',
-    title: 'পাবনা এক্সপ্রেস ঢাকা কাউন্টার',
+    title: 'পাবনা এক্সপ্রেস',
     category: Category.BUS_COUNTER,
     upazila: 'ঢাকা',
     area: 'গাবতলী',
-    description: 'পাবনা এক্সপ্রেসের ঢাকা অঞ্চলের সকল গুরুত্বপূর্ণ কাউন্টার নম্বরসমূহ। যাত্রী সাধারণের সুবিধার জন্য ঢাকা শহর এবং এর আশেপাশের এলাকার নম্বরগুলো এখানে দেওয়া হলো।',
-    addresses: ['গাবতলী, ঢাকা', 'সায়েদাবাদ, ঢাকা', 'উত্তরা, ঢাকা'],
-    contacts: ['01718507828', '01799624848'],
+    description: 'পাবনা এক্সপ্রেস গাবতলী কাউন্টার।',
+    addresses: ['গাবতলী, ঢাকা'],
+    contacts: ['01718507828'],
     imageUrl: 'https://i.ibb.co/b5XrFJxp/266762814-208341711466108-9127291067624475523-n.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
     timestamp: 1713000000000,
   },
   {
+    id: '5.1',
+    title: 'পাবনা এক্সপ্রেস',
+    category: Category.BUS_COUNTER,
+    upazila: 'ঢাকা',
+    area: 'সায়েদাবাদ',
+    description: 'পাবনা এক্সপ্রেস সায়েদাবাদ কাউন্টার।',
+    addresses: ['সায়েদাবাদ, ঢাকা'],
+    contacts: ['01799624848'],
+    imageUrl: 'https://i.ibb.co/b5XrFJxp/266762814-208341711466108-9127291067624475523-n.jpg',
+    addedBy: 'মীর রাব্বি হোসেন',
+    timestamp: 1713000000001,
+  },
+  {
     id: '4',
-    title: 'পাবনা এক্সপ্রেস পাবনা টার্মিনাল',
+    title: 'সি-লাইন পরিবহন',
     category: Category.BUS_COUNTER,
     upazila: 'পাবনা সদর',
     area: 'পাবনা সদর',
-    description: 'পাবনা জেলার অন্যতম জনপ্রিয় বাস সার্ভিস। পাবনা শহর থেকে ঢাকা এবং অন্যান্য রুটে নিয়মিত বাস চলাচল করে।',
-    addresses: ['পাবনা নতুন বাস টার্মিনাল', 'আঃ হামিদ রোড, পাবনা'],
-    contacts: ['01750143092', '01725442643'],
+    description: 'পাবনা জেলার অন্যতম জনপ্রিয় বাস সার্ভিস।',
+    addresses: ['পাবনা নতুন বাস টার্মিনাল'],
+    contacts: ['01750143092'],
     imageUrl: 'https://i.ibb.co/rRSZ4F4Q/images.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
     timestamp: 1712000000000,
   },
   {
-    id: '2',
-    title: 'মায়ের দোয়া রেস্টুরেন্ট',
-    category: Category.FOOD,
+    id: 'e1',
+    title: 'ফায়ার সার্ভিস পাবনা',
+    category: Category.FIRE_SERVICE,
     upazila: 'পাবনা সদর',
     area: 'পাবনা শহর',
-    description: 'সেরা বিরিয়ানি এবং ঘরোয়া খাবার পাওয়া যায়। পরিচ্ছন্ন পরিবেশ এবং উন্নত মানের সার্ভিস।',
-    addresses: ['আব্দুল হামিদ রোড, পাবনা সদর', 'ট্রাফিক মোড়, পাবনা সদর'],
-    contacts: ['01822334455'],
-    imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&get=80&w=1000',
+    description: 'যেকোনো অগ্নিকাণ্ড বা দুর্ঘটনায় দ্রুত সেবার জন্য।',
+    addresses: ['পাবনা সদর'],
+    contacts: ['01730336644'],
+    imageUrl: 'https://cdn-icons-png.flaticon.com/512/3662/3662829.png',
     addedBy: 'মীর রাব্বি হোসেন',
-    timestamp: 1711000000000, 
+    timestamp: Date.now(),
+  },
+  {
+    id: 'e2',
+    title: 'পাবনা জেলা অ্যাম্বুলেন্স সার্ভিস',
+    category: Category.AMBULANCE,
+    upazila: 'পাবনা সদর',
+    area: 'পাবনা সদর',
+    description: 'জরুরি রোগী পরিবহনের জন্য অ্যাম্বুলেন্স।',
+    addresses: ['পাবনা জেনারেল হাসপাতাল সংলগ্ন'],
+    contacts: ['01711223344'],
+    imageUrl: 'https://cdn-icons-png.flaticon.com/512/3448/3448341.png',
+    addedBy: 'মীর রাব্বি হোসেন',
+    timestamp: Date.now(),
   }
 ];
+
+// আইটেম কার্ড কম্পোনেন্ট
+const ItemCard: React.FC<{ 
+  item: AreaInfo; 
+  onDetail: () => void;
+  onCopy: (num: string) => void;
+  isCopied: boolean;
+}> = ({ item, onDetail, onCopy, isCopied }) => {
+  return (
+    <div className="bg-white border border-gray-100 shadow-sm overflow-hidden flex flex-col active:scale-[0.99] transition-transform" onClick={onDetail}>
+      <div className="flex p-3 gap-3">
+        {item.imageUrl && (
+          <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+            <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-bold text-gray-800 line-clamp-1">{item.title}</h3>
+          <p className="text-[10px] text-gray-400 mt-0.5 uppercase font-bold tracking-tight">{item.category}</p>
+          
+          <div className="mt-4 flex items-center justify-between gap-2">
+            {/* Left side: Location */}
+            <div className="flex items-center gap-1 min-w-0 overflow-hidden">
+              <MapPin className="w-3 h-3 text-indigo-400 shrink-0" />
+              <span className="text-[10px] text-gray-500 truncate font-medium">{item.area}</span>
+            </div>
+            
+            {/* Right side: Phone actions in one line */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg">
+                <Phone className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
+                <span className="text-[10px] text-gray-800 font-bold whitespace-nowrap">{item.contacts[0]}</span>
+              </div>
+              
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onCopy(item.contacts[0]); }}
+                  className={`p-1.5 rounded-lg transition-all ${isCopied ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-500 hover:text-indigo-600'}`}
+                >
+                  {isCopied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                </button>
+                <a 
+                  href={`tel:${item.contacts[0]}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1.5 bg-indigo-600 text-white rounded-lg transition-all shadow-sm"
+                >
+                  <PhoneCall className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ImageSlider: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -147,53 +230,137 @@ const ImageSlider: React.FC = () => {
           <img key={idx} src={img} className="w-full h-full object-cover shrink-0" alt="Slider" />
         ))}
       </div>
-      {/* Dots removed as requested */}
     </div>
   );
 };
 
-// ক্যাটাগরি ডেটাবেস ভিউ কম্পোনেন্ট
+// ক্যাটাগরি ভিউ কম্পোনেন্ট উইথ সাব-ক্যাটাগরি
 const CategoryListView: React.FC<{
   category: string;
   data: AreaInfo[];
   goBack: () => void;
-}> = ({ category, data, goBack }) => {
+  onItemDetail: (item: AreaInfo) => void;
+}> = ({ category, data, goBack, onItemDetail }) => {
+  const [selectedSub, setSelectedSub] = useState<string | null>(null);
+  const [copiedNum, setCopiedNum] = useState<string | null>(null);
+
+  const handleCopy = (num: string) => {
+    navigator.clipboard.writeText(num);
+    setCopiedNum(num);
+    setTimeout(() => setCopiedNum(null), 2000);
+  };
+
+  // সাব-ক্যাটাগরি লজিক
+  const subCategories = useMemo(() => {
+    if (category === Category.BUS_COUNTER) {
+      // বাস কাউন্টার এর জন্য ডুপ্লিকেট নামগুলো গ্রুপ করা
+      const counts: Record<string, number> = {};
+      data.forEach(item => counts[item.title] = (counts[item.title] || 0) + 1);
+      return Object.entries(counts).filter(([_, count]) => count > 1).map(([name]) => name);
+    }
+    if (category === 'EMERGENCY_HUB') {
+      return ['অ্যাম্বুলেন্স সার্ভিস', 'ফায়ার সার্ভিস', 'ডিউটি পুলিশ', 'ইমার্জেন্সি নাম্বার'];
+    }
+    return [];
+  }, [category, data]);
+
+  const filteredItems = useMemo(() => {
+    if (!selectedSub) {
+      if (subCategories.length > 0) return []; 
+      return data;
+    }
+    
+    if (category === Category.BUS_COUNTER) {
+      return data.filter(item => item.title === selectedSub);
+    }
+    
+    if (category === 'EMERGENCY_HUB') {
+      const mapping: Record<string, Category> = {
+        'অ্যাম্বুলেন্স সার্ভিস': Category.AMBULANCE,
+        'ফায়ার সার্ভিস': Category.FIRE_SERVICE,
+        'ডিউটি পুলিশ': Category.POLICE
+      };
+      if (selectedSub === 'ইমার্জেন্সি নাম্বার') {
+        return [{
+          id: 'hotline1',
+          title: 'জাতীয় জরুরি সেবা',
+          category: Category.OTHER,
+          area: 'বাংলাদেশ',
+          description: '৯৯৯ হেল্পলাইন',
+          contacts: ['999'],
+          addresses: ['সারাদেশ'],
+          addedBy: 'সিস্টেম',
+          timestamp: Date.now()
+        }] as AreaInfo[];
+      }
+      return data.filter(item => item.category === mapping[selectedSub]);
+    }
+    
+    return data;
+  }, [selectedSub, data, subCategories, category]);
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#f0f2f5] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
-      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-2 flex items-center gap-4">
-        <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
+    <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
+      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center gap-4">
+        <button onClick={selectedSub ? () => setSelectedSub(null) : goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
         <div>
-          <h2 className="text-sm font-bold text-gray-800">{category}</h2>
-          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">({data.length} টি)</p>
+          <h2 className="text-sm font-bold text-gray-800">{selectedSub || category.replace('EMERGENCY_HUB', 'ইমার্জেন্সি সার্ভিস')}</h2>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{selectedSub ? 'তথ্যসমূহ' : 'ক্যাটাগরি'}</p>
         </div>
       </header>
       
-      <main className="max-w-md mx-auto p-4 space-y-3 pb-20">
-        {data.length > 0 ? data.map((item) => (
-          <div key={item.id} className="bg-white p-4 border border-gray-100 shadow-sm flex gap-4 pointer-events-none">
-            {item.imageUrl && (
-              <div className="w-16 h-16 overflow-hidden shrink-0 bg-gray-50">
-                <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
+      <main className="max-w-md mx-auto p-4 space-y-4 pb-24">
+        {!selectedSub && subCategories.length > 0 ? (
+          <div className="grid grid-cols-1 gap-3">
+            {subCategories.map((sub) => (
+              <button 
+                key={sub}
+                onClick={() => setSelectedSub(sub)}
+                className="flex items-center justify-between p-4 bg-white border border-gray-100 shadow-sm active:scale-[0.98] transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-50 text-indigo-600 flex items-center justify-center rounded-lg">
+                    {category === 'EMERGENCY_HUB' ? (
+                      sub.includes('অ্যাম্বুলেন্স') ? <Siren className="w-5 h-5" /> :
+                      sub.includes('ফায়ার') ? <Flame className="w-5 h-5" /> :
+                      sub.includes('পুলিশ') ? <ShieldAlert className="w-5 h-5" /> : <Phone className="w-5 h-5" />
+                    ) : <Bus className="w-5 h-5" />}
+                  </div>
+                  <span className="text-[13px] font-bold text-gray-700">{sub}</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </button>
+            ))}
+            
+            {/* যদি আরও আইটেম থাকে যেগুলো সাবক্যাটেগরির বাইরে */}
+            {category === Category.BUS_COUNTER && data.filter(item => !subCategories.includes(item.title)).map(item => (
+               <ItemCard 
+                key={item.id} 
+                item={item} 
+                onDetail={() => onItemDetail(item)} 
+                onCopy={handleCopy}
+                isCopied={copiedNum === item.contacts[0]}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredItems.length > 0 ? filteredItems.map((item) => (
+              <ItemCard 
+                key={item.id} 
+                item={item} 
+                onDetail={() => onItemDetail(item)} 
+                onCopy={handleCopy}
+                isCopied={copiedNum === item.contacts[0]}
+              />
+            )) : (
+              <div className="py-20 text-center">
+                <LayoutGrid className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                <p className="text-sm text-gray-400">কোনো তথ্য পাওয়া যায়নি</p>
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-gray-800 truncate">{item.title}</h3>
-              <div className="flex items-center gap-1 mt-1">
-                <MapPin className="w-3 h-3 text-indigo-400" />
-                <p className="text-[11px] text-gray-500 truncate">{item.area}</p>
-              </div>
-              <div className="flex items-center gap-1 mt-1.5">
-                <PhoneCall className="w-3 h-3 text-emerald-500" />
-                <p className="text-[11px] font-bold text-gray-700">{item.contacts[0]}</p>
-              </div>
-            </div>
-          </div>
-        )) : (
-          <div className="py-20 text-center">
-            <List className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-            <p className="text-sm text-gray-400">কোনো তথ্য নেই</p>
           </div>
         )}
       </main>
@@ -210,7 +377,7 @@ interface HomeViewProps {
   loadMore: () => void;
   hasMore: boolean;
   navigateToAreaItem: (item: AreaInfo) => void;
-  onCategoryClick: (cat: Category) => void;
+  onCategoryClick: (cat: string) => void;
   toggleSave: (e: React.MouseEvent, id: string) => void;
   savedIds: string[];
   isOffline: boolean;
@@ -225,8 +392,7 @@ const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <>
-      {/* ফিক্সড ও ছোট হেডার */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md pt-3 pb-2 safe-top border-b border-gray-100 shadow-sm transition-all duration-300">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md pt-3 pb-2 safe-top border-b border-gray-100 shadow-sm">
         <div className="max-w-md mx-auto px-4">
           <div className="flex justify-between items-center h-10">
             <h1 className="text-lg font-bold text-indigo-700 flex items-center gap-1.5 tracking-tight">
@@ -266,19 +432,16 @@ const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </header>
 
-      {/* স্ক্রোলযোগ্য মেইন কন্টেন্ট */}
       <main className="w-full">
-        {/* ইমেজ স্লাইডার */}
         <ImageSlider />
 
         <div className="max-w-md mx-auto px-4">
-          {/* এনিমেটেড ক্যাটাগরি গ্রিড */}
           <div className="mb-8">
             <div className="grid grid-cols-2 gap-3">
               {HERO_CATEGORIES.map((cat) => (
                 <button 
                   key={cat.name} 
-                  onClick={() => onCategoryClick(cat.name as Category)} 
+                  onClick={() => onCategoryClick(cat.name)} 
                   className={`group flex flex-col items-center justify-center p-4 border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-indigo-100 active:scale-[0.97] text-center space-y-2.5 ${cat.lightColor}`}
                 >
                   <div className={`p-2.5 ${cat.color} text-white shadow-md shadow-black/5 transition-all duration-300 ${cat.anim}`}>
@@ -397,7 +560,7 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
   <div className="fixed inset-0 z-50 bg-[#f0f2f5] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
     <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center gap-4"><button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-none transition-all"><ArrowLeft className="w-5 h-5 text-gray-600" /></button><h2 className="text-base font-bold text-gray-800">অ্যাপ তথ্য</h2></header>
     <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
-      <div className="text-center py-10 bg-white rounded-none border border-gray-100 shadow-sm"><div className="w-16 h-16 bg-indigo-600 rounded-none mx-auto flex items-center justify-center shadow-lg mb-4"><MapPin className="w-8 h-8 text-white" /></div><h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3><p className="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৪.২.১ (ফিক্সড হেডার)</p></div>
+      <div className="text-center py-10 bg-white rounded-none border border-gray-100 shadow-sm"><div className="w-16 h-16 bg-indigo-600 rounded-none mx-auto flex items-center justify-center shadow-lg mb-4"><MapPin className="w-8 h-8 text-white" /></div><h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3><p className="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৪.৩.০ (সাব-ক্যাটাগরি আপডেট)</p></div>
       <section className="space-y-4"><h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার প্রোফাইল</h4><div className="bg-white p-5 border border-gray-100 shadow-sm flex items-center gap-4"><div className="w-14 h-14 overflow-hidden shadow-sm border border-gray-50"><img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" /></div><div><h5 className="font-bold text-gray-800 text-sm">মীর রাব্বি হোসেন</h5><p className="text-[10px] text-indigo-600 font-bold">পাবনা জেলা, বাংলাদেশ</p></div></div></section>
     </main>
   </div>
@@ -409,7 +572,7 @@ const ITEMS_PER_PAGE = 20;
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<Category | 'সব'>('সব');
+  const [selectedCategory, setSelectedCategory] = useState<string>('সব');
   const [selectedAreaItem, setSelectedAreaItem] = useState<AreaInfo | null>(null);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
@@ -432,10 +595,12 @@ const App: React.FC = () => {
   const filteredData = useMemo(() => {
     const str = searchTerm.toLowerCase();
     return DATA.filter(item => {
-      const matchesSearch = item.title.toLowerCase().includes(str) || item.description.toLowerCase().includes(str) || item.area.toLowerCase().includes(str) || item.upazila.toLowerCase().includes(str) || item.addresses.some(a => a.toLowerCase().includes(str)) || item.contacts.some(c => c.toLowerCase().includes(str));
+      const matchesSearch = item.title.toLowerCase().includes(str) || item.description.toLowerCase().includes(str) || item.area.toLowerCase().includes(str) || item.upazila.toLowerCase().includes(str);
       const matchesCategory = selectedCategory === 'সব' || item.category === selectedCategory;
+      // ইমার্জেন্সি হাব এর স্পেশাল ফিল্টার
+      const isEmergency = selectedCategory === 'EMERGENCY_HUB' && [Category.AMBULANCE, Category.FIRE_SERVICE, Category.POLICE].includes(item.category);
       const matchesSaved = !showSavedOnly || savedIds.includes(item.id);
-      return matchesSearch && matchesCategory && matchesSaved;
+      return (matchesSearch && (matchesCategory || isEmergency)) && matchesSaved;
     }).sort((a, b) => b.timestamp - a.timestamp);
   }, [searchTerm, selectedCategory, showSavedOnly, savedIds]);
 
@@ -443,13 +608,16 @@ const App: React.FC = () => {
   
   const categorySpecificData = useMemo(() => {
     if (selectedCategory === 'সব') return [];
+    if (selectedCategory === 'EMERGENCY_HUB') {
+       return DATA.filter(item => [Category.AMBULANCE, Category.FIRE_SERVICE, Category.POLICE].includes(item.category));
+    }
     return DATA.filter(item => item.category === selectedCategory);
   }, [selectedCategory]);
 
   useEffect(() => { setVisibleCount(ITEMS_PER_PAGE); }, [searchTerm, selectedCategory, showSavedOnly]);
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5]">
+    <div className="min-h-screen bg-[#f8fafc]">
       {currentView === 'home' && (
         <HomeView 
           searchTerm={searchTerm} setSearchTerm={setSearchTerm}
@@ -462,7 +630,12 @@ const App: React.FC = () => {
         />
       )}
       {currentView === 'category-list' && (
-        <CategoryListView category={selectedCategory} data={categorySpecificData} goBack={() => { setCurrentView('home'); setSelectedCategory('সব'); }} />
+        <CategoryListView 
+          category={selectedCategory} 
+          data={categorySpecificData} 
+          goBack={() => { setCurrentView('home'); setSelectedCategory('সব'); }} 
+          onItemDetail={(item) => { setSelectedAreaItem(item); setCurrentView('area-detail'); }}
+        />
       )}
       {currentView === 'area-detail' && selectedAreaItem && (
         <DetailView item={selectedAreaItem} goBack={() => setCurrentView('home')} toggleSave={(e, id) => { e.stopPropagation(); setSavedIds(p => p.includes(id) ? p.filter(i => i !== id) : [...p, id]); }} savedIds={savedIds} handleCopy={(t) => { navigator.clipboard.writeText(t); setCopiedText(t); setTimeout(() => setCopiedText(null), 2000); }} copiedText={copiedText} openInMaps={(a) => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`, '_blank')} />
