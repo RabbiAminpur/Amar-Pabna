@@ -2,7 +2,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Phone, Info, X, Copy, PhoneCall, 
-  ExternalLink, Check, ArrowLeft, Heart, Bookmark, WifiOff
+  ExternalLink, Check, ArrowLeft, Heart, Bookmark, WifiOff,
+  User, ShieldCheck, HelpCircle, Code
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
@@ -87,12 +88,13 @@ interface HomeViewProps {
   toggleSave: (e: React.MouseEvent, id: string) => void;
   savedIds: string[];
   isOffline: boolean;
+  openAbout: () => void;
 }
 
 const HomeView: React.FC<HomeViewProps> = ({ 
   searchTerm, setSearchTerm, selectedCategory, setSelectedCategory, 
   showSavedOnly, setShowSavedOnly, filteredData, navigateToAreaItem, 
-  toggleSave, savedIds, isOffline 
+  toggleSave, savedIds, isOffline, openAbout 
 }) => (
   <>
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 shadow-sm safe-top">
@@ -108,13 +110,20 @@ const HomeView: React.FC<HomeViewProps> = ({
             <MapPin className="w-6 h-6 fill-indigo-100" />
             আমার পাবনা
           </h1>
-          <button 
-            onClick={() => setShowSavedOnly(!showSavedOnly)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
-          >
-            <Heart className={`w-4 h-4 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
-            <span className="text-[11px] font-bold uppercase tracking-tight">সংরক্ষিত</span>
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setShowSavedOnly(!showSavedOnly)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
+            >
+              <Heart className={`w-4 h-4 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
+            </button>
+            <button 
+              onClick={openAbout}
+              className="p-1.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-full hover:bg-white transition-all"
+            >
+              <Info className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         
         <div className="relative mb-4">
@@ -177,31 +186,20 @@ const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
         ))}
-        
-        {filteredData.length === 0 && (
-          <div className="col-span-2 text-center py-20 opacity-40">
-            {showSavedOnly ? <Bookmark className="w-12 h-12 mx-auto mb-4" /> : <Search className="w-12 h-12 mx-auto mb-4" />}
-            <p className="text-sm font-medium">{showSavedOnly ? 'আপনার কোনো তথ্য সংরক্ষণ করা নেই' : 'কোনো তথ্য খুঁজে পাওয়া যায়নি'}</p>
-          </div>
-        )}
       </div>
     </main>
   </>
 );
 
-interface DetailViewProps {
-  item: AreaInfo;
-  goBack: () => void;
-  toggleSave: (e: React.MouseEvent, id: string) => void;
-  savedIds: string[];
-  handleCopy: (text: string) => void;
-  copiedText: string | null;
-  openInMaps: (addr: string) => void;
-}
-
-const DetailView: React.FC<DetailViewProps> = ({ 
-  item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps 
-}) => (
+const DetailView: React.FC<{ 
+  item: AreaInfo; 
+  goBack: () => void; 
+  toggleSave: (e: React.MouseEvent, id: string) => void; 
+  savedIds: string[]; 
+  handleCopy: (text: string) => void; 
+  copiedText: string | null; 
+  openInMaps: (addr: string) => void; 
+}> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => (
   <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-bottom duration-300 safe-top safe-bottom">
     <div className="relative aspect-video w-full max-w-md mx-auto bg-gray-100">
       <img src={item.imageUrl} className="w-full h-full object-cover" alt="" />
@@ -211,54 +209,38 @@ const DetailView: React.FC<DetailViewProps> = ({
         </button>
       </div>
       <div className="absolute top-4 right-4">
-        <button 
-          onClick={(e) => toggleSave(e, item.id)}
-          className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20"
-        >
+        <button onClick={(e) => toggleSave(e, item.id)} className="p-3 bg-black/40 backdrop-blur-md text-white rounded-2xl border border-white/20">
           <Heart className={`w-5 h-5 ${savedIds.includes(item.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
         </button>
       </div>
     </div>
-
     <div className="p-6 max-w-md mx-auto">
       <div className="flex items-center gap-2 mb-2">
-        <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">
-          {item.category}
-        </span>
+        <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
       </div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-4 leading-tight">{item.title}</h2>
-      <p className="text-gray-600 text-sm leading-relaxed mb-8 whitespace-pre-wrap">{item.description}</p>
-
-      <div className="space-y-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">{item.title}</h2>
+      <p className="text-gray-600 text-sm leading-relaxed mb-8">{item.description}</p>
+      <div className="space-y-6">
         <section className="space-y-4">
-          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-            <Phone className="w-3 h-3 text-indigo-500" /> যোগাযোগ নম্বর সমূহ ({item.contacts.length})
-          </h4>
+          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">যোগাযোগ নম্বর</h4>
           {item.contacts.map((num, idx) => (
             <div key={idx} className="flex items-center justify-between gap-3 bg-gray-50 p-4 rounded-3xl border border-gray-100">
               <p className="text-sm text-gray-800 font-bold">{num}</p>
               <div className="flex gap-2">
-                <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400 shadow-sm'}`}>
+                <button onClick={() => handleCopy(num)} className={`p-3 rounded-2xl transition-all ${copiedText === num ? 'bg-green-600 text-white' : 'bg-white text-gray-400'}`}>
                   {copiedText === num ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
-                <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl shadow-lg shadow-green-100">
-                  <PhoneCall className="w-4 h-4" />
-                </a>
+                <a href={`tel:${num}`} className="p-3 bg-green-600 text-white rounded-2xl"><PhoneCall className="w-4 h-4" /></a>
               </div>
             </div>
           ))}
         </section>
-
         <section className="space-y-4">
-          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-            <MapPin className="w-3 h-3 text-indigo-500" /> বিস্তারিত ঠিকানা ({item.addresses.length})
-          </h4>
+          <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">ঠিকানা</h4>
           {item.addresses.map((addr, idx) => (
             <div key={idx} className="flex items-center justify-between gap-3 bg-indigo-50/20 p-4 rounded-3xl border border-indigo-50">
-              <p className="text-sm text-gray-700 font-medium leading-snug">{addr}</p>
-              <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-white text-indigo-600 rounded-2xl shadow-sm border border-indigo-100">
-                <ExternalLink className="w-4 h-4" />
-              </button>
+              <p className="text-sm text-gray-700 font-medium">{addr}</p>
+              <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-white text-indigo-600 rounded-2xl border border-indigo-100"><ExternalLink className="w-4 h-4" /></button>
             </div>
           ))}
         </section>
@@ -267,7 +249,78 @@ const DetailView: React.FC<DetailViewProps> = ({
   </div>
 );
 
-type ViewState = 'home' | 'area-detail';
+const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
+  <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
+    <header className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-4 flex items-center gap-4">
+      <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
+        <ArrowLeft className="w-6 h-6 text-gray-600" />
+      </button>
+      <h2 className="text-lg font-bold text-gray-800">অ্যাপ সম্পর্কিত</h2>
+    </header>
+
+    <main className="max-w-md mx-auto p-6 space-y-8">
+      <div className="text-center py-6 bg-indigo-50 rounded-3xl border border-indigo-100">
+        <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-200 mb-4">
+          <MapPin className="w-10 h-10 text-white" />
+        </div>
+        <h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3>
+        <p className="text-sm text-gray-400 font-medium mt-1">ভার্সন: ১.০.০ (বেটা)</p>
+      </div>
+
+      <section className="space-y-4">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-indigo-500" /> অ্যাপের উদ্দেশ্য
+        </h4>
+        <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm leading-relaxed text-gray-600 text-sm">
+          "আমার পাবনা" একটি অলাভজনক উদ্যোগ। পাবনা জেলার সকল প্রয়োজনীয় এবং জরুরি তথ্য (যেমন: হাসপাতাল, ফায়ার সার্ভিস, অ্যাম্বুলেন্স) খুব সহজে এক জায়গায় মানুষের কাছে পৌঁছে দেওয়াই এই অ্যাপের মূল লক্ষ্য।
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 text-indigo-500" /> ব্যবহার বিধি
+        </h4>
+        <div className="space-y-3">
+          {[
+            'উপরে থাকা সার্চ বক্সে আপনার প্রয়োজনীয় জায়গার নাম লিখে সার্চ করুন।',
+            'ক্যাটাগরি বাটনগুলোতে ক্লিক করে আলাদা ভাবে তথ্য দেখতে পারেন।',
+            'জরুরি নম্বরগুলোর পাশে থাকা কল আইকনে ক্লিক করে সরাসরি কল করুন।',
+            'ভবিষ্যতে অফলাইনে দেখার জন্য হার্ট আইকনে ক্লিক করে তথ্য সেভ করে রাখুন।',
+            'একবার লোড হওয়ার পর অ্যাপটি ইন্টারনেট ছাড়াই কাজ করবে।'
+          ].map((text, i) => (
+            <div key={i} className="flex gap-3 text-sm text-gray-600">
+              <div className="w-5 h-5 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center shrink-0 font-bold text-[10px]">
+                {i + 1}
+              </div>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <Code className="w-4 h-4 text-indigo-500" /> ডেভেলপার তথ্য
+        </h4>
+        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-200">
+            <User className="w-6 h-6 text-gray-400" />
+          </div>
+          <div>
+            <p className="font-bold text-gray-800 text-sm">পাবনা টেক টিম</p>
+            <p className="text-[11px] text-gray-500">ডেভেলপমেন্ট ও মেইনটেনেন্স</p>
+          </div>
+        </div>
+      </section>
+
+      <p className="text-center text-[10px] text-gray-300 pt-6">
+        © ২০২৪ আমার পাবনা। সকল অধিকার সংরক্ষিত।
+      </p>
+    </main>
+  </div>
+);
+
+type ViewState = 'home' | 'area-detail' | 'about';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
@@ -282,15 +335,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
     const stored = localStorage.getItem('amar_pabna_saved');
-    if (stored) {
-      try { setSavedIds(JSON.parse(stored)); } catch (e) {}
-    }
-
+    if (stored) { try { setSavedIds(JSON.parse(stored)); } catch (e) {} }
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -303,9 +351,7 @@ const App: React.FC = () => {
 
   const toggleSave = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setSavedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+    setSavedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const filteredData = useMemo(() => {
@@ -336,40 +382,27 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const navigateToAreaItem = (item: AreaInfo) => {
-    setSelectedAreaItem(item);
-    setCurrentView('area-detail');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-10">
-      {currentView === 'home' ? (
+      {currentView === 'home' && (
         <HomeView 
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          showSavedOnly={showSavedOnly}
-          setShowSavedOnly={setShowSavedOnly}
-          filteredData={filteredData}
-          navigateToAreaItem={navigateToAreaItem}
-          toggleSave={toggleSave}
-          savedIds={savedIds}
-          isOffline={isOffline}
+          searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+          selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
+          showSavedOnly={showSavedOnly} setShowSavedOnly={setShowSavedOnly}
+          filteredData={filteredData} 
+          navigateToAreaItem={(item) => { setSelectedAreaItem(item); setCurrentView('area-detail'); window.scrollTo({ top: 0 }); }}
+          toggleSave={toggleSave} savedIds={savedIds} isOffline={isOffline}
+          openAbout={() => setCurrentView('about')}
         />
-      ) : (
-        selectedAreaItem && (
-          <DetailView 
-            item={selectedAreaItem}
-            goBack={goBack}
-            toggleSave={toggleSave}
-            savedIds={savedIds}
-            handleCopy={handleCopy}
-            copiedText={copiedText}
-            openInMaps={openInMaps}
-          />
-        )
+      )}
+      {currentView === 'area-detail' && selectedAreaItem && (
+        <DetailView 
+          item={selectedAreaItem} goBack={goBack} toggleSave={toggleSave}
+          savedIds={savedIds} handleCopy={handleCopy} copiedText={copiedText} openInMaps={openInMaps}
+        />
+      )}
+      {currentView === 'about' && (
+        <AboutView goBack={goBack} />
       )}
     </div>
   );
