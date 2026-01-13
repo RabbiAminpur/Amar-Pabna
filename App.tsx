@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Phone, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, Bookmark, WifiOff,
-  User, ShieldCheck, HelpCircle, Code
+  User, ShieldCheck, HelpCircle, Code, GraduationCap, Globe, Facebook, MessageCircle
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
@@ -119,7 +119,7 @@ const HomeView: React.FC<HomeViewProps> = ({
             </button>
             <button 
               onClick={openAbout}
-              className="p-1.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-full hover:bg-white transition-all"
+              className="p-1.5 bg-gray-50 border border-gray-100 text-gray-400 rounded-full hover:bg-white transition-all shadow-sm"
             >
               <Info className="w-5 h-5" />
             </button>
@@ -155,7 +155,7 @@ const HomeView: React.FC<HomeViewProps> = ({
     </header>
 
     <main className="max-w-md mx-auto px-4 mt-6">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 pb-20">
         {filteredData.map((item) => (
           <div 
             key={item.id} 
@@ -250,71 +250,127 @@ const DetailView: React.FC<{
 );
 
 const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
-  <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
-    <header className="sticky top-0 z-10 bg-white border-b border-gray-100 px-4 py-4 flex items-center gap-4">
+  <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top safe-bottom">
+    <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4">
       <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
         <ArrowLeft className="w-6 h-6 text-gray-600" />
       </button>
       <h2 className="text-lg font-bold text-gray-800">অ্যাপ সম্পর্কিত</h2>
     </header>
 
-    <main className="max-w-md mx-auto p-6 space-y-8">
-      <div className="text-center py-6 bg-indigo-50 rounded-3xl border border-indigo-100">
-        <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-200 mb-4">
+    <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
+      {/* App Branding */}
+      <div className="text-center py-8 bg-white rounded-3xl border border-gray-100 shadow-sm">
+        <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-indigo-100 mb-4">
           <MapPin className="w-10 h-10 text-white" />
         </div>
-        <h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3>
-        <p className="text-sm text-gray-400 font-medium mt-1">ভার্সন: ১.০.০ (বেটা)</p>
+        <h3 className="text-2xl font-bold text-gray-800 tracking-tight">আমার পাবনা</h3>
+        <p className="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ১.০.০ (বেটা)</p>
       </div>
 
+      {/* Developer Section */}
       <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <Code className="w-4 h-4 text-indigo-500" /> ডেভেলপার প্রোফাইল
+        </h4>
+        <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-indigo-50/50 overflow-hidden">
+          <div className="relative h-32 bg-indigo-600 overflow-hidden">
+            <div className="absolute inset-0 opacity-10">
+              <Code className="w-32 h-32 -rotate-12 -ml-8 -mt-4" />
+            </div>
+          </div>
+          <div className="px-6 pb-8 -mt-16 relative">
+            <div className="w-32 h-32 rounded-3xl border-4 border-white overflow-hidden shadow-lg bg-gray-100 mx-auto mb-4">
+              <img 
+                src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" 
+                alt="Mir Rabbi Hossain" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="text-center mb-6">
+              <h5 className="text-xl font-bold text-gray-800">মীর রাব্বি হোসেন</h5>
+              <p className="text-indigo-600 text-xs font-bold uppercase tracking-wider mt-1">পূর্ণ স্ট্যাক ডেভেলপার</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                  <GraduationCap className="w-5 h-5 text-indigo-500" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase">শিক্ষাগত যোগ্যতা</p>
+                  <p className="text-sm font-bold text-gray-700">বিবিএ (অনার্স)</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                  <Globe className="w-5 h-5 text-indigo-500" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase">বর্তমান অবস্থান</p>
+                  <p className="text-sm font-bold text-gray-700">কুয়ালালামপুর, মালয়েশিয়া</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-8">
+              <a 
+                href="https://facebook.com/rabbi.aminpur" 
+                target="_blank" 
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-indigo-100"
+              >
+                <Facebook className="w-4 h-4" /> ফেসবুক
+              </a>
+              <a 
+                href="https://wa.me/60187698459" 
+                target="_blank" 
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 py-3 bg-green-50 text-green-600 rounded-2xl font-bold text-xs transition-all active:scale-95 border border-green-100"
+              >
+                <MessageCircle className="w-4 h-4" /> হোয়াটসঅ্যাপ
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Purpose */}
+      <section className="space-y-4">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
           <ShieldCheck className="w-4 h-4 text-indigo-500" /> অ্যাপের উদ্দেশ্য
         </h4>
-        <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm leading-relaxed text-gray-600 text-sm">
+        <div className="bg-white border border-gray-100 p-6 rounded-3xl shadow-sm leading-relaxed text-gray-600 text-sm italic">
           "আমার পাবনা" একটি অলাভজনক উদ্যোগ। পাবনা জেলার সকল প্রয়োজনীয় এবং জরুরি তথ্য (যেমন: হাসপাতাল, ফায়ার সার্ভিস, অ্যাম্বুলেন্স) খুব সহজে এক জায়গায় মানুষের কাছে পৌঁছে দেওয়াই এই অ্যাপের মূল লক্ষ্য।
         </div>
       </section>
 
+      {/* Usage Guide */}
       <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2 ml-1">
           <HelpCircle className="w-4 h-4 text-indigo-500" /> ব্যবহার বিধি
         </h4>
-        <div className="space-y-3">
+        <div className="grid gap-3">
           {[
-            'উপরে থাকা সার্চ বক্সে আপনার প্রয়োজনীয় জায়গার নাম লিখে সার্চ করুন।',
-            'ক্যাটাগরি বাটনগুলোতে ক্লিক করে আলাদা ভাবে তথ্য দেখতে পারেন।',
-            'জরুরি নম্বরগুলোর পাশে থাকা কল আইকনে ক্লিক করে সরাসরি কল করুন।',
-            'ভবিষ্যতে অফলাইনে দেখার জন্য হার্ট আইকনে ক্লিক করে তথ্য সেভ করে রাখুন।',
-            'একবার লোড হওয়ার পর অ্যাপটি ইন্টারনেট ছাড়াই কাজ করবে।'
+            'সার্চ বক্সে জায়গার নাম লিখে সার্চ করুন।',
+            'ক্যাটাগরি বাটনগুলোতে ক্লিক করে তথ্য ফিল্টার করুন।',
+            'কল আইকনে ক্লিক করে সরাসরি যোগাযোগ করুন।',
+            'হার্ট আইকনে ক্লিক করে তথ্য সেভ করে রাখুন।',
+            'অ্যাপটি অফলাইন মোডেও ব্যবহার করা যায়।'
           ].map((text, i) => (
-            <div key={i} className="flex gap-3 text-sm text-gray-600">
-              <div className="w-5 h-5 bg-indigo-50 text-indigo-600 rounded-md flex items-center justify-center shrink-0 font-bold text-[10px]">
+            <div key={i} className="flex items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl">
+              <div className="w-6 h-6 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px]">
                 {i + 1}
               </div>
-              <p>{text}</p>
+              <p className="text-sm text-gray-600 font-medium">{text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-          <Code className="w-4 h-4 text-indigo-500" /> ডেভেলপার তথ্য
-        </h4>
-        <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center border border-gray-200">
-            <User className="w-6 h-6 text-gray-400" />
-          </div>
-          <div>
-            <p className="font-bold text-gray-800 text-sm">পাবনা টেক টিম</p>
-            <p className="text-[11px] text-gray-500">ডেভেলপমেন্ট ও মেইনটেনেন্স</p>
-          </div>
-        </div>
-      </section>
-
-      <p className="text-center text-[10px] text-gray-300 pt-6">
-        © ২০২৪ আমার পাবনা। সকল অধিকার সংরক্ষিত।
+      <p className="text-center text-[10px] text-gray-300 pt-10">
+        © ২০২৪ আমার পাবনা। ডিজাইন ও ডেভেলপমেন্ট মীর রাব্বি হোসেন।
       </p>
     </main>
   </div>
