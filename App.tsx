@@ -4,7 +4,7 @@ import {
   Search, MapPin, Phone, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, Bookmark, WifiOff,
   User, ShieldCheck, HelpCircle, Code, GraduationCap, Globe, Facebook, MessageCircle, Edit3, Clock, Link as LinkIcon,
-  Filter, MousePointer2, Save, Smartphone, Map
+  Filter, MousePointer2, Save, Smartphone, Map, ChevronDown
 } from 'lucide-react';
 import { AreaInfo, Category, SocialLink } from './types.ts';
 
@@ -77,7 +77,7 @@ const DATA: AreaInfo[] = [
     title: 'মায়ের দোয়া রেস্টুরেন্ট',
     category: Category.FOOD,
     description: 'সেরা বিরিয়ানি এবং ঘরোয়া খাবার পাওয়া যায়। পরিচ্ছন্ন পরিবেশ এবং উন্নত মানের সার্ভিস।',
-    addresses: ['আব্দুল হামিদ রোড, পাবনা', 'শাখা ২: ট্রাফিক মোড়'],
+    addresses: ['আব্দুল হামিদ রোড, পাবনা সদর', 'ট্রাফিক মোড়, পাবনা সদর'],
     contacts: ['01822334455', '01311223344'],
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&get=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
@@ -91,7 +91,7 @@ const DATA: AreaInfo[] = [
     title: 'পাবনা এক্সপ্রেস (কাউন্টার)',
     category: Category.BUS_COUNTER,
     description: 'এখান থেকে ঢাকা ও চট্টগ্রামের বাস নিয়মিত ছেড়ে যায়। টিকেট কাউন্টার সকাল ৬টা থেকে রাত ১০টা পর্যন্ত খোলা থাকে।',
-    addresses: ['লস্করপুর টার্মিনাল, পাবনা', 'কাউন্টার ২, লাইব্রেরি বাজার'],
+    addresses: ['লস্করপুর টার্মিনাল, পাবনা সদর', 'কাউন্টার ২, লাইব্রেরি বাজার, পাবনা সদর'],
     contacts: ['01555555555', '01444444444'],
     imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000',
     addedBy: 'মীর রাব্বি হোসেন',
@@ -99,14 +99,26 @@ const DATA: AreaInfo[] = [
   }
 ];
 
+// পরিচিত এলাকার তালিকা যা অ্যাড্রেস থেকে খুঁজে বের করা হবে
+const KNOWN_LOCATIONS = [
+  'কাশিনাথপুর', 'বেড়া', 'আমিনপুর', 'পাবনা সদর', 'পাবনা শহর', 
+  'ঈশ্বরদী', 'চাটমোহর', 'আটঘরিয়া', 'সুজানগর', 'ফরিদপুর', 'সাথিয়া', 'ঢাকা'
+];
+
 interface HomeViewProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   selectedCategory: Category | 'সব';
   setSelectedCategory: (cat: Category | 'সব') => void;
+  selectedLocation: string | 'সব';
+  setSelectedLocation: (loc: string | 'সব') => void;
+  uniqueLocations: string[];
   showSavedOnly: boolean;
   setShowSavedOnly: (val: boolean) => void;
   filteredData: AreaInfo[];
+  visibleData: AreaInfo[];
+  loadMore: () => void;
+  hasMore: boolean;
   navigateToAreaItem: (item: AreaInfo) => void;
   toggleSave: (e: React.MouseEvent, id: string) => void;
   savedIds: string[];
@@ -116,8 +128,9 @@ interface HomeViewProps {
 
 const HomeView: React.FC<HomeViewProps> = ({ 
   searchTerm, setSearchTerm, selectedCategory, setSelectedCategory, 
-  showSavedOnly, setShowSavedOnly, filteredData, navigateToAreaItem, 
-  toggleSave, savedIds, isOffline, openAbout 
+  selectedLocation, setSelectedLocation, uniqueLocations,
+  showSavedOnly, setShowSavedOnly, filteredData, visibleData, loadMore, hasMore,
+  navigateToAreaItem, toggleSave, savedIds, isOffline, openAbout 
 }) => (
   <>
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 shadow-sm safe-top">
@@ -168,18 +181,31 @@ const HomeView: React.FC<HomeViewProps> = ({
           )}
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <button onClick={() => setSelectedCategory('সব')} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[13px] font-medium transition-all ${selectedCategory === 'সব' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}>সব</button>
-          {Object.values(Category).map((cat) => (
-            <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[13px] font-medium transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}>{cat}</button>
-          ))}
+        <div className="space-y-3">
+          {/* ক্যাটাগরি ফিল্টার */}
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center">
+            <span className="text-[10px] font-bold text-gray-400 uppercase shrink-0 border-r pr-2 border-gray-200">সেবা</span>
+            <button onClick={() => setSelectedCategory('সব')} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[12px] font-medium transition-all ${selectedCategory === 'সব' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}>সব</button>
+            {Object.values(Category).map((cat) => (
+              <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[12px] font-medium transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'bg-white border border-gray-100 text-gray-500'}`}>{cat}</button>
+            ))}
+          </div>
+
+          {/* লোকেশন ফিল্টার (হিরো অপশন) */}
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center border-t pt-3 border-gray-50">
+             <span className="text-[10px] font-bold text-gray-400 uppercase shrink-0 border-r pr-2 border-gray-200">এলাকা</span>
+             <button onClick={() => setSelectedLocation('সব')} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[12px] font-medium transition-all ${selectedLocation === 'সব' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white border border-gray-100 text-gray-500'}`}>সব এলাকা</button>
+             {uniqueLocations.map((loc) => (
+               <button key={loc} onClick={() => setSelectedLocation(loc)} className={`px-4 py-1.5 rounded-xl whitespace-nowrap text-[12px] font-medium transition-all ${selectedLocation === loc ? 'bg-emerald-600 text-white shadow-md shadow-emerald-100' : 'bg-white border border-gray-100 text-gray-500'}`}>{loc}</button>
+             ))}
+          </div>
         </div>
       </div>
     </header>
 
     <main className="max-w-md mx-auto px-4 mt-6">
-      <div className="grid grid-cols-2 gap-3 pb-20">
-        {filteredData.length > 0 ? filteredData.map((item) => (
+      <div className="grid grid-cols-2 gap-3 pb-6">
+        {visibleData.length > 0 ? visibleData.map((item) => (
           <div 
             key={item.id} 
             onClick={() => navigateToAreaItem(item)} 
@@ -217,6 +243,17 @@ const HomeView: React.FC<HomeViewProps> = ({
           </div>
         )}
       </div>
+
+      {hasMore && (
+        <div className="pb-24">
+          <button 
+            onClick={loadMore}
+            className="w-full py-4 bg-white border border-indigo-100 rounded-2xl text-indigo-600 text-sm font-bold shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+          >
+            আরও দেখুন <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </main>
   </>
 );
@@ -555,15 +592,19 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => {
 
 type ViewState = 'home' | 'area-detail' | 'about';
 
+const ITEMS_PER_PAGE = 20;
+
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'সব'>('সব');
+  const [selectedLocation, setSelectedLocation] = useState<string | 'সব'>('সব');
   const [selectedAreaItem, setSelectedAreaItem] = useState<AreaInfo | null>(null);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -582,6 +623,19 @@ const App: React.FC = () => {
     localStorage.setItem('amar_pabna_saved', JSON.stringify(savedIds));
   }, [savedIds]);
 
+  // ডাইনামিক লোকেশন এক্সট্রাকশন (ঠিকানা থেকে এলাকার নাম খুঁজে বের করা)
+  const uniqueLocations = useMemo(() => {
+    const locations = new Set<string>();
+    DATA.forEach(item => {
+      item.addresses.forEach(addr => {
+        KNOWN_LOCATIONS.forEach(loc => {
+          if (addr.includes(loc)) locations.add(loc);
+        });
+      });
+    });
+    return Array.from(locations).sort();
+  }, []);
+
   const toggleSave = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     setSavedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -590,7 +644,6 @@ const App: React.FC = () => {
   const filteredData = useMemo(() => {
     const searchStr = searchTerm.toLowerCase();
     return DATA.filter(item => {
-      // বিস্তৃত সার্চ লজিক: টাইটেল, ডেসক্রিপশন, ক্যাটাগরি, ঠিকানা এবং ফোন নম্বর দিয়েও সার্চ করা যাবে
       const matchesSearch = item.title.toLowerCase().includes(searchStr) || 
                            item.description.toLowerCase().includes(searchStr) ||
                            item.category.toLowerCase().includes(searchStr) ||
@@ -598,10 +651,26 @@ const App: React.FC = () => {
                            item.contacts.some(c => c.toLowerCase().includes(searchStr));
                            
       const matchesCategory = selectedCategory === 'সব' || item.category === selectedCategory;
+      const matchesLocation = selectedLocation === 'সব' || item.addresses.some(a => a.includes(selectedLocation));
       const matchesSaved = !showSavedOnly || savedIds.includes(item.id);
-      return matchesSearch && matchesCategory && matchesSaved;
+      
+      return matchesSearch && matchesCategory && matchesLocation && matchesSaved;
     }).sort((a, b) => b.timestamp - a.timestamp);
-  }, [searchTerm, selectedCategory, showSavedOnly, savedIds]);
+  }, [searchTerm, selectedCategory, selectedLocation, showSavedOnly, savedIds]);
+
+  // ফিল্টার করা ডাটা থেকে শুধুমাত্র নির্দিষ্ট সংখ্যক ডাটা দেখানো (প্যাজিনেশন)
+  const visibleData = useMemo(() => {
+    return filteredData.slice(0, visibleCount);
+  }, [filteredData, visibleCount]);
+
+  const loadMore = () => {
+    setVisibleCount(prev => prev + ITEMS_PER_PAGE);
+  };
+
+  // সার্চ বা ফিল্টার পরিবর্তন হলে প্যাজিনেশন রিসেট করা
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [searchTerm, selectedCategory, selectedLocation, showSavedOnly]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -625,8 +694,13 @@ const App: React.FC = () => {
         <HomeView 
           searchTerm={searchTerm} setSearchTerm={setSearchTerm}
           selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory}
+          selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation}
+          uniqueLocations={uniqueLocations}
           showSavedOnly={showSavedOnly} setShowSavedOnly={setShowSavedOnly}
           filteredData={filteredData} 
+          visibleData={visibleData}
+          loadMore={loadMore}
+          hasMore={visibleCount < filteredData.length}
           navigateToAreaItem={(item) => { setSelectedAreaItem(item); setCurrentView('area-detail'); window.scrollTo({ top: 0 }); }}
           toggleSave={toggleSave} savedIds={savedIds} isOffline={isOffline}
           openAbout={() => setCurrentView('about')}
