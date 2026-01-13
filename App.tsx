@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, MapPin, Info, X, Copy, PhoneCall, 
@@ -8,7 +7,7 @@ import {
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
-// হিরো সেকশনের ৪টি প্রধান ক্যাটাগরি কনফিগ
+// হিরো সেকশনের ৪টি প্রধান ক্যাটাগরি কনফিগ এনিমেশন সহ
 const HERO_CATEGORIES = [
   { 
     name: Category.HEALTH, 
@@ -16,7 +15,8 @@ const HERO_CATEGORIES = [
     icon: Stethoscope, 
     color: 'bg-blue-500', 
     lightColor: 'bg-blue-50',
-    textColor: 'text-blue-600'
+    textColor: 'text-blue-600',
+    anim: 'animate-soft-pulse'
   },
   { 
     name: Category.BUS_COUNTER, 
@@ -24,7 +24,8 @@ const HERO_CATEGORIES = [
     icon: Bus, 
     color: 'bg-indigo-500', 
     lightColor: 'bg-indigo-50',
-    textColor: 'text-indigo-600'
+    textColor: 'text-indigo-600',
+    anim: 'animate-float'
   },
   { 
     name: Category.AMBULANCE, 
@@ -32,7 +33,8 @@ const HERO_CATEGORIES = [
     icon: Siren, 
     color: 'bg-rose-500', 
     lightColor: 'bg-rose-50',
-    textColor: 'text-rose-600'
+    textColor: 'text-rose-600',
+    anim: 'animate-bounce-custom'
   },
   { 
     name: Category.HOTEL, 
@@ -40,7 +42,8 @@ const HERO_CATEGORIES = [
     icon: Hotel, 
     color: 'bg-amber-500', 
     lightColor: 'bg-amber-50',
-    textColor: 'text-amber-600'
+    textColor: 'text-amber-600',
+    anim: 'animate-wobble'
   },
 ];
 
@@ -52,7 +55,7 @@ const DATA: AreaInfo[] = [
     upazila: 'আমিনপুর (থানা এলাকা)',
     area: 'কাশিনাথপুর',
     description: 'কাশিনাথপুর এলাকার একটি আধুনিক আবাসিক হোটেল। এখানে উন্নত মানের এসি (AC) এবং নন-এসি রুমের ব্যবস্থা রয়েছে। ভ্রমণকারী বা ব্যবসায়িক প্রয়োজনে আসা মেহমানদের জন্য এটি একটি নিরাপদ ও আরামদায়ক আবাসন। হোটেলের নিচেই প্রয়োজনীয় বাজার ও যাতায়াতের সুব্যবস্থা রয়েছে।',
-    addresses: ['নুর প্লাজা, কাশিনাথপুর ফুলবাগান ট্রাফিক মোড়, আমিনপুর, পাবনা', 'XJ54+CR Kashinathpur, Bangladesh'],
+    addresses: ['নুর প্লাজা, কাশিনাথপুর ফুলবাগান ট্রাফিক মোড়, aminpur, Pabna', 'XJ54+CR Kashinathpur, Bangladesh'],
     contacts: ['01775142831'],
     imageUrl: 'https://i.ibb.co/1Gy7sVSb/IMG-20260113-222912.jpg',
     addedBy: 'মীর রাব্বি হোসেন',
@@ -144,11 +147,7 @@ const ImageSlider: React.FC = () => {
           <img key={idx} src={img} className="w-full h-full object-cover shrink-0" alt="Slider" />
         ))}
       </div>
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-        {sliderImages.map((_, idx) => (
-          <div key={idx} className={`w-1.5 h-1.5 transition-all duration-300 ${currentIndex === idx ? 'bg-white w-4' : 'bg-white/40'}`} />
-        ))}
-      </div>
+      {/* Dots removed as requested */}
     </div>
   );
 };
@@ -161,13 +160,13 @@ const CategoryListView: React.FC<{
 }> = ({ category, data, goBack }) => {
   return (
     <div className="fixed inset-0 z-50 bg-[#f0f2f5] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
-      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center gap-4">
+      <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-2 flex items-center gap-4">
         <button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
         <div>
-          <h2 className="text-base font-bold text-gray-800">{category}</h2>
-          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">তথ্য ভাণ্ডার ({data.length})</p>
+          <h2 className="text-sm font-bold text-gray-800">{category}</h2>
+          <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">({data.length} টি)</p>
         </div>
       </header>
       
@@ -226,49 +225,42 @@ const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <>
-      {/* ফিক্সড হেডার */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md pt-4 pb-3 safe-top border-b border-gray-100 shadow-sm transition-all duration-300">
+      {/* ফিক্সড ও ছোট হেডার */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md pt-3 pb-2 safe-top border-b border-gray-100 shadow-sm transition-all duration-300">
         <div className="max-w-md mx-auto px-4">
-          {isOffline && (
-            <div className="flex items-center justify-center gap-2 mb-2 bg-amber-50 py-1 rounded-none border border-amber-100">
-              <WifiOff className="w-2.5 h-2.5 text-amber-600" />
-              <span className="text-[9px] font-bold text-amber-600">অফলাইন মোড</span>
-            </div>
-          )}
-          
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="text-xl font-bold text-indigo-700 flex items-center gap-1.5 tracking-tight">
-              <MapPin className="w-5 h-5 fill-indigo-200" />
+          <div className="flex justify-between items-center h-10">
+            <h1 className="text-lg font-bold text-indigo-700 flex items-center gap-1.5 tracking-tight">
+              <MapPin className="w-4 h-4 fill-indigo-200" />
               আমার পাবনা
             </h1>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1">
               <button 
                 onClick={() => setIsSearchVisible(!isSearchVisible)} 
-                className={`p-2 rounded-none transition-all border ${isSearchVisible ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
+                className={`p-1.5 rounded transition-all border ${isSearchVisible ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-3.5 h-3.5" />
               </button>
-              <button onClick={() => setShowSavedOnly(!showSavedOnly)} className={`p-2 rounded-none transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
-                <Heart className={`w-4 h-4 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
+              <button onClick={() => setShowSavedOnly(!showSavedOnly)} className={`p-1.5 rounded transition-all border ${showSavedOnly ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+                <Heart className={`w-3.5 h-3.5 ${showSavedOnly ? 'fill-rose-500' : ''}`} />
               </button>
-              <button onClick={openAbout} className="p-2 bg-gray-50 border border-gray-100 text-gray-400 rounded-none">
-                <Info className="w-4 h-4" />
+              <button onClick={openAbout} className="p-1.5 bg-gray-50 border border-gray-100 text-gray-400 rounded">
+                <Info className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
-          <div className={`overflow-hidden transition-all duration-300 ${isSearchVisible ? 'max-h-16 mt-3 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+          <div className={`overflow-hidden transition-all duration-300 ${isSearchVisible ? 'max-h-12 mt-2 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-3 h-3" />
               <input 
                 type="text" 
                 placeholder="যেকোনো সেবা খুঁজুন..." 
-                className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-none focus:outline-none focus:ring-1 focus:ring-indigo-500/20 focus:bg-white transition-all text-xs font-medium shadow-inner" 
+                className="w-full pl-8 pr-4 py-2 bg-gray-50 border border-gray-100 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500/20 focus:bg-white transition-all text-[11px] font-medium shadow-inner" 
                 value={searchTerm} 
                 onChange={(e) => setSearchTerm(e.target.value)} 
                 autoFocus={isSearchVisible}
               />
-              {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400"><X className="w-3 h-3" /></button>}
+              {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400"><X className="w-2.5 h-2.5" /></button>}
             </div>
           </div>
         </div>
@@ -276,11 +268,11 @@ const HomeView: React.FC<HomeViewProps> = ({
 
       {/* স্ক্রোলযোগ্য মেইন কন্টেন্ট */}
       <main className="w-full">
-        {/* ইমেজ স্লাইডার (ফুল উইডথ) */}
+        {/* ইমেজ স্লাইডার */}
         <ImageSlider />
 
         <div className="max-w-md mx-auto px-4">
-          {/* ক্যাটাগরি গ্রিড */}
+          {/* এনিমেটেড ক্যাটাগরি গ্রিড */}
           <div className="mb-8">
             <div className="grid grid-cols-2 gap-3">
               {HERO_CATEGORIES.map((cat) => (
@@ -289,7 +281,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                   onClick={() => onCategoryClick(cat.name as Category)} 
                   className={`group flex flex-col items-center justify-center p-4 border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-indigo-100 active:scale-[0.97] text-center space-y-2.5 ${cat.lightColor}`}
                 >
-                  <div className={`p-2.5 ${cat.color} text-white shadow-md shadow-black/5 transition-all duration-300 group-hover:scale-110 group-hover:animate-pulse`}>
+                  <div className={`p-2.5 ${cat.color} text-white shadow-md shadow-black/5 transition-all duration-300 ${cat.anim}`}>
                     <cat.icon className="w-5 h-5" />
                   </div>
                   <div>
@@ -405,7 +397,7 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
   <div className="fixed inset-0 z-50 bg-[#f0f2f5] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
     <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex items-center gap-4"><button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-none transition-all"><ArrowLeft className="w-5 h-5 text-gray-600" /></button><h2 className="text-base font-bold text-gray-800">অ্যাপ তথ্য</h2></header>
     <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
-      <div className="text-center py-10 bg-white rounded-none border border-gray-100 shadow-sm"><div className="w-16 h-16 bg-indigo-600 rounded-none mx-auto flex items-center justify-center shadow-lg mb-4"><MapPin className="w-8 h-8 text-white" /></div><h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3><p className="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৪.১.০ (এনিমেটেড সার্চ)</p></div>
+      <div className="text-center py-10 bg-white rounded-none border border-gray-100 shadow-sm"><div className="w-16 h-16 bg-indigo-600 rounded-none mx-auto flex items-center justify-center shadow-lg mb-4"><MapPin className="w-8 h-8 text-white" /></div><h3 className="text-xl font-bold text-gray-800">আমার পাবনা</h3><p className="text-[9px] text-gray-400 font-bold mt-1 uppercase tracking-widest">ভার্সন: ৪.২.১ (ফিক্সড হেডার)</p></div>
       <section className="space-y-4"><h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ডেভেলপার প্রোফাইল</h4><div className="bg-white p-5 border border-gray-100 shadow-sm flex items-center gap-4"><div className="w-14 h-14 overflow-hidden shadow-sm border border-gray-50"><img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" /></div><div><h5 className="font-bold text-gray-800 text-sm">মীর রাব্বি হোসেন</h5><p className="text-[10px] text-indigo-600 font-bold">পাবনা জেলা, বাংলাদেশ</p></div></div></section>
     </main>
   </div>
