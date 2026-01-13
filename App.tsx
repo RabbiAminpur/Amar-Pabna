@@ -1,17 +1,12 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
-  Search, MapPin, Info, X, Copy, PhoneCall, 
-  ExternalLink, Check, ArrowLeft, Heart, WifiOff,
-  Clock, ChevronDown, LayoutGrid, List,
+  Search, MapPin, Info, ArrowLeft, Heart,
   Stethoscope, Bus, Siren, Hotel, ChevronRight,
-  Flame, ShieldAlert, Phone, Map, Landmark, 
-  Navigation, ImageIcon, User, Calendar, Briefcase,
-  Building2, ClipboardList, CreditCard, Building,
-  Contact2, Hash, ShieldCheck, Droplets, Store, ShoppingBasket,
-  Tags, Ship, Train, Waves, Anchor, Compass, Route as RouteIcon,
-  Home, BookOpen, UserCircle, Facebook, Mail, Globe, Code, Github,
-  CalendarDays, Moon, Sunrise, Sun, Sunset, Quote, Book, Eye,
-  ChevronLeft
+  Landmark, User, Building2, CreditCard, ShieldCheck, 
+  Store, Route as RouteIcon, Home, BookOpen, UserCircle, 
+  Facebook, Mail, Globe, Code, Github, Phone, PhoneCall,
+  ChevronLeft, Sunrise, Sunset, Moon, Quote, Book, Eye, Calendar, CalendarDays,
+  Map as MapIcon // Aliased to avoid collision with global Map
 } from 'lucide-react';
 import { AreaInfo, Category, UpazilaName, UpazilaInfo } from './types.ts';
 
@@ -21,7 +16,7 @@ const HERO_CATEGORIES = [
   { name: Category.BUS_COUNTER, label: 'বাস কাউন্টার', icon: Bus, color: 'bg-indigo-500', lightColor: 'bg-indigo-50', textColor: 'text-indigo-600', anim: 'animate-float' },
   { name: 'EMERGENCY_HUB', label: 'ইমার্জেন্সি সার্ভিস', icon: Siren, color: 'bg-rose-500', lightColor: 'bg-rose-50', textColor: 'text-rose-600', anim: 'animate-bounce-custom' },
   { name: Category.HOTEL, label: 'হোটেল সার্ভিস', icon: Hotel, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-600', anim: 'animate-wobble' },
-  { name: Category.TOURIST_SPOT, label: 'দর্শনীয় স্থান', icon: Map, color: 'bg-teal-500', lightColor: 'bg-teal-50', textColor: 'text-teal-600', anim: 'animate-soft-pulse' },
+  { name: Category.TOURIST_SPOT, label: 'দর্শনীয় স্থান', icon: MapIcon, color: 'bg-teal-500', lightColor: 'bg-teal-50', textColor: 'text-teal-600', anim: 'animate-soft-pulse' },
   { name: Category.ANCIENT_ARCH, label: 'প্রাচীন স্থাপত্য', icon: Landmark, color: 'bg-orange-500', lightColor: 'bg-orange-50', textColor: 'text-orange-600', anim: 'animate-float' },
   { name: Category.PERSONALITY, label: 'ব্যক্তিত্ব', icon: User, color: 'bg-purple-500', lightColor: 'bg-purple-50', textColor: 'text-purple-600', anim: 'animate-soft-pulse' },
   { name: Category.GOVT_OFFICE, label: 'সরকারি অফিস', icon: Building2, color: 'bg-emerald-500', lightColor: 'bg-emerald-50', textColor: 'text-emerald-600', anim: 'animate-float' },
@@ -564,24 +559,13 @@ type ViewState = 'home' | 'area-detail' | 'category-list' | 'upazila-list' | 'up
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('home');
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('সব');
   const [selectedAreaItem, setSelectedAreaItem] = useState<AreaInfo | null>(null);
   const [selectedUpazila, setSelectedUpazila] = useState<UpazilaInfo | null>(null);
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    const stored = localStorage.getItem('amar_pabna_saved');
-    if (stored) { try { setSavedIds(JSON.parse(stored)); } catch (e) {} }
-    return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
-  }, []);
-
-  useEffect(() => { localStorage.setItem('amar_pabna_saved', JSON.stringify(savedIds)); }, [savedIds]);
+    window.scrollTo({ top: 0 });
+  }, [currentView]);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -656,9 +640,6 @@ const App: React.FC = () => {
                 <div className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold border border-indigo-100 uppercase">তথ্য ছক</div>
               </button>
             ))}
-            {UPAZILA_DATA.length === 0 && (
-              <div className="py-20 text-center"><p className="text-sm text-gray-400">তথ্য যুক্ত হচ্ছে...</p></div>
-            )}
           </main>
         </div>
       )}
@@ -729,7 +710,7 @@ const App: React.FC = () => {
       )}
 
       {/* Global Bottom Navigation */}
-      <BottomNav activeTab={currentView.includes('upazila') ? 'upazila-list' : currentView.includes('dev') ? 'dev-info' : 'home'} onTabChange={(tab) => { setCurrentView(tab); window.scrollTo({ top: 0 }); }} />
+      <BottomNav activeTab={currentView.includes('upazila') ? 'upazila-list' : currentView.includes('dev') ? 'dev-info' : 'home'} onTabChange={(tab) => { setCurrentView(tab); }} />
 
     </div>
   );
