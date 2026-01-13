@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   Search, MapPin, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ArrowLeft, Heart, WifiOff,
@@ -10,7 +10,8 @@ import {
   Contact2, Hash, ShieldCheck, Droplets, Store, ShoppingBasket,
   Tags, Ship, Train, Waves, Anchor, Compass, Route as RouteIcon,
   Home, BookOpen, UserCircle, Facebook, Mail, Globe, Code, Github,
-  CalendarDays, Moon, Sunrise, Sun, Sunset, Quote, Book, Eye
+  CalendarDays, Moon, Sunrise, Sun, Sunset, Quote, Book, Eye,
+  ChevronLeft
 } from 'lucide-react';
 import { AreaInfo, Category, UpazilaName, UpazilaInfo } from './types.ts';
 
@@ -28,6 +29,24 @@ const HERO_CATEGORIES = [
   { name: Category.POLICE, label: 'থানা', icon: ShieldCheck, color: 'bg-slate-700', lightColor: 'bg-slate-50', textColor: 'text-slate-700', anim: 'animate-float' },
   { name: Category.MARKET, label: 'হাট বাজার', icon: Store, color: 'bg-lime-600', lightColor: 'bg-lime-50', textColor: 'text-lime-700', anim: 'animate-soft-pulse' },
   { name: Category.TRANSPORT_ROUTE, label: 'পরিবহন ও রুট', icon: RouteIcon, color: 'bg-violet-600', lightColor: 'bg-violet-50', textColor: 'text-violet-700', anim: 'animate-float' },
+];
+
+const SLIDER_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1590603740183-980e7f6920eb?auto=format&fit=crop&w=1000&q=80',
+    title: 'হার্ডিঞ্জ ব্রিজ ও লালন শাহ সেতু',
+    subtitle: 'ঈশ্বরদী, পাবনা'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=1000&q=80',
+    title: 'পাবনা শহর ও প্রশাসনিক এলাকা',
+    subtitle: 'পাবনা সদর'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1593115057322-e94b77572f20?auto=format&fit=crop&w=1000&q=80',
+    title: 'ঐতিহাসিক স্থাপত্য ও মন্দির',
+    subtitle: 'পাবনার গৌরবময় অতীত'
+  }
 ];
 
 const UPAZILA_DATA: UpazilaInfo[] = [
@@ -184,6 +203,64 @@ const getDailyHadiths = () => {
 };
 
 // --- Components ---
+
+const HeroSlider: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % SLIDER_IMAGES.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + SLIDER_IMAGES.length) % SLIDER_IMAGES.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
+
+  return (
+    <div className="relative w-full aspect-[16/9] overflow-hidden rounded-[32px] mb-8 bg-gray-100 shadow-xl shadow-black/5 group">
+      {SLIDER_IMAGES.map((img, idx) => (
+        <div
+          key={idx}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            idx === currentIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <img src={img.url} className="w-full h-full object-cover" alt={img.title} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-6 left-6 right-6 text-white">
+            <h2 className="text-xl font-black mb-1 leading-tight">{img.title}</h2>
+            <p className="text-xs font-bold text-gray-300 uppercase tracking-widest">{img.subtitle}</p>
+          </div>
+        </div>
+      ))}
+      
+      {/* Controls */}
+      <button onClick={prevSlide} className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/20 backdrop-blur-md rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button onClick={nextSlide} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/20 backdrop-blur-md rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {SLIDER_IMAGES.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              idx === currentIndex ? 'bg-indigo-500 w-6' : 'bg-white/40'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const RemembranceCard: React.FC = () => (
   <div className="bg-white border border-indigo-100 rounded-[24px] p-6 shadow-sm shadow-indigo-50/50 mb-8 text-center relative overflow-hidden group">
@@ -512,10 +589,14 @@ const App: React.FC = () => {
           </header>
           <main className="pb-24">
             <div className="max-w-md mx-auto px-4 mt-6">
+              
+              {/* Image Slider Component */}
+              <HeroSlider />
+
               <div className="grid grid-cols-2 gap-3 mb-8">
                 {HERO_CATEGORIES.map((cat) => (
-                  <button key={cat.name} onClick={() => { setSelectedCategory(cat.name); setCurrentView('category-list'); }} className={`group flex flex-col items-center justify-center p-4 border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-indigo-100 active:scale-[0.97] text-center space-y-2.5 ${cat.lightColor}`}>
-                    <div className={`p-2.5 ${cat.color} text-white shadow-md shadow-black/5 ${cat.anim}`}>
+                  <button key={cat.name} onClick={() => { setSelectedCategory(cat.name); setCurrentView('category-list'); }} className={`group flex flex-col items-center justify-center p-4 border border-gray-100 shadow-sm rounded-2xl transition-all hover:shadow-md hover:border-indigo-100 active:scale-[0.97] text-center space-y-2.5 ${cat.lightColor}`}>
+                    <div className={`p-2.5 ${cat.color} text-white shadow-md shadow-black/5 rounded-xl ${cat.anim}`}>
                       <cat.icon className="w-5 h-5" />
                     </div>
                     <p className={`text-[12px] font-bold ${cat.textColor} leading-tight`}>{cat.label}</p>
