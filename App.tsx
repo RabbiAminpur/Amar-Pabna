@@ -4,7 +4,7 @@ import {
   Search, MapPin, Phone, Info, X, Copy, PhoneCall, 
   ExternalLink, Check, ChevronRight, ArrowLeft, Heart, Bookmark
 } from 'lucide-react';
-import { AreaInfo, Category } from './types';
+import { AreaInfo, Category } from './types.ts';
 
 const DATA: AreaInfo[] = [
   {
