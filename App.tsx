@@ -6,7 +6,7 @@ import {
   Clock, ChevronDown, LayoutGrid, List,
   Stethoscope, Bus, Siren, Hotel, ChevronRight,
   Flame, ShieldAlert, Phone, Map, Landmark, 
-  Navigation, ImageIcon
+  Navigation, ImageIcon, User, Calendar, Briefcase
 } from 'lucide-react';
 import { AreaInfo, Category } from './types.ts';
 
@@ -66,9 +66,35 @@ const HERO_CATEGORIES = [
     textColor: 'text-orange-600',
     anim: 'animate-float'
   },
+  { 
+    name: Category.PERSONALITY, 
+    label: 'ব্যক্তিত্ব', 
+    icon: User, 
+    color: 'bg-purple-500', 
+    lightColor: 'bg-purple-50',
+    textColor: 'text-purple-600',
+    anim: 'animate-soft-pulse'
+  },
 ];
 
 const DATA: AreaInfo[] = [
+  {
+    id: 'per-1',
+    title: 'অনুকূলচন্দ্র চক্রবর্তী',
+    category: Category.PERSONALITY,
+    upazila: 'পাবনা সদর',
+    area: 'হিমায়েতপুর',
+    description: 'শ্রীশ্রীঠাকুর অনুকূলচন্দ্র একজন হিন্দু ধর্মীয় সংস্কারক ছিলেন। তিনি সৎসঙ্গ নামক সংগঠনের প্রবর্তক। তার আদর্শ ও দর্শন লক্ষ লক্ষ মানুষের জীবনকে প্রভাবিত করেছে। হিমায়েতপুরে তার প্রতিষ্ঠিত সৎসঙ্গ আশ্রম পাবনার অন্যতম গর্ব।',
+    dob: '১৪ সেপ্টেম্বর ১৮৮৮',
+    dod: '২৬ জানুয়ারি ১৯৬৯',
+    pob: 'হিমায়েতপুর, পাবনা',
+    profession: 'ধর্মীয় সংস্কারক ও সাধক',
+    addresses: ['সৎসঙ্গ আশ্রম, হিমায়েতপুর, পাবনা'],
+    contacts: ['-'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Sree_Sree_Thakur_Anukulchandra.jpg/800px-Sree_Sree_Thakur_Anukulchandra.jpg',
+    addedBy: 'মীর রাব্বি হোসেন',
+    timestamp: Date.now(),
+  },
   {
     id: 'ts-1',
     title: 'হার্ডিঞ্জ ব্রিজ',
@@ -152,7 +178,7 @@ const ItemCard: React.FC<{
   onCopy: (num: string) => void;
   isCopied: boolean;
 }> = ({ item, onDetail, onCopy, isCopied }) => {
-  const isSpecial = item.category === Category.TOURIST_SPOT || item.category === Category.ANCIENT_ARCH;
+  const isSpecial = item.category === Category.TOURIST_SPOT || item.category === Category.ANCIENT_ARCH || item.category === Category.PERSONALITY;
   const hasPhone = !isSpecial && item.contacts && item.contacts[0] !== '-';
 
   return (
@@ -169,8 +195,14 @@ const ItemCard: React.FC<{
           
           <div className="mt-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-1 min-w-0 overflow-hidden">
-              <MapPin className="w-3 h-3 text-indigo-400 shrink-0" />
-              <span className="text-[10px] text-gray-500 truncate font-medium">{item.area}</span>
+              {item.category === Category.PERSONALITY ? (
+                <Briefcase className="w-3 h-3 text-purple-400 shrink-0" />
+              ) : (
+                <MapPin className="w-3 h-3 text-indigo-400 shrink-0" />
+              )}
+              <span className="text-[10px] text-gray-500 truncate font-medium">
+                {item.category === Category.PERSONALITY ? (item.profession || item.area) : item.area}
+              </span>
             </div>
             
             {hasPhone && (
@@ -472,6 +504,7 @@ const HomeView: React.FC<HomeViewProps> = ({
 
 const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e: React.MouseEvent, id: string) => void; savedIds: string[]; handleCopy: (text: string) => void; copiedText: string | null; openInMaps: (addr: string) => void; }> = ({ item, goBack, toggleSave, savedIds, handleCopy, copiedText, openInMaps }) => {
   const isSpecial = item.category === Category.TOURIST_SPOT || item.category === Category.ANCIENT_ARCH;
+  const isPersonality = item.category === Category.PERSONALITY;
   
   const getRelativeTime = (ts: number) => {
     const diff = Date.now() - ts;
@@ -497,13 +530,13 @@ const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e:
         
         <div className="flex items-center gap-2 mb-3">
           <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider">{item.category}</span>
-          {!isSpecial && <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold tracking-wider">{item.area}</span>}
+          {!isSpecial && !isPersonality && <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold tracking-wider">{item.area}</span>}
         </div>
         
         <h2 className="text-2xl font-black text-gray-800 mb-2 leading-tight tracking-tight">{item.title}</h2>
         
         <div className="flex items-center gap-1.5 mb-6 opacity-60">
-          {isSpecial ? (
+          {isPersonality ? null : isSpecial ? (
             <>
               <MapPin className="w-3.5 h-3.5 text-indigo-500" />
               <span className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">{item.area}</span>
@@ -516,10 +549,62 @@ const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e:
           )}
         </div>
 
-        {/* ইমজ গ্যালারি */}
+        {isPersonality && (
+          <div className="space-y-4 mb-8">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Calendar className="w-3 h-3 text-indigo-500" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase">জন্ম তারিখ</span>
+                </div>
+                <p className="text-[13px] text-gray-700 font-bold">{item.dob || '-'}</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Calendar className="w-3 h-3 text-rose-500" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase">মৃত্যু তারিখ</span>
+                </div>
+                <p className="text-[13px] text-gray-700 font-bold">{item.dod || 'বেঁচে আছেন'}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <MapPin className="w-3 h-3 text-emerald-500" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase">জন্ম স্থান</span>
+                </div>
+                <p className="text-[13px] text-gray-700 font-bold">{item.pob || '-'}</p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Briefcase className="w-3 h-3 text-amber-500" />
+                  <span className="text-[10px] font-bold text-gray-400 uppercase">পেশা</span>
+                </div>
+                <p className="text-[13px] text-gray-700 font-bold">{item.profession || '-'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <section className="mb-8">
+          {!isSpecial && !isPersonality && <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">বিস্তারিত তথ্য</h4>}
+          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{item.description}</p>
+        </section>
+
+        {/* যাতায়াত ব্যবস্থা */}
+        {item.howToGo && (
+          <section className="mb-8 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
+            <h4 className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">
+              <Navigation className="w-3 h-3" /> কিভাবে যাবেন
+            </h4>
+            <p className="text-gray-700 text-[13px] leading-relaxed italic">{item.howToGo}</p>
+          </section>
+        )}
+
+        {/* ইমজ গ্যালারি - মেইন কন্টেন্টের শেষে */}
         {item.galleryImages && item.galleryImages.length > 0 && (
           <section className="mb-8">
-            {!isSpecial && (
+            {!isSpecial && !isPersonality && (
               <h4 className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                 <ImageIcon className="w-3 h-3" /> ছবি গ্যালারি
               </h4>
@@ -534,23 +619,8 @@ const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e:
           </section>
         )}
 
-        <section className="mb-8">
-          {!isSpecial && <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">বিস্তারিত তথ্য</h4>}
-          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{item.description}</p>
-        </section>
-
-        {/* যাতায়াত ব্যবস্থা */}
-        {item.howToGo && (
-          <section className="mb-8 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100">
-            <h4 className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">
-              <Navigation className="w-3 h-3" /> কিভাবে যাবেন
-            </h4>
-            <p className="text-gray-700 text-[13px] leading-relaxed italic">{item.howToGo}</p>
-          </section>
-        )}
-
         <div className="space-y-8 pb-12">
-          {!isSpecial && item.contacts[0] !== '-' && (
+          {!isSpecial && !isPersonality && item.contacts[0] !== '-' && (
             <section className="space-y-3">
               <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">যোগাযোগ</h4>
               {item.contacts.map((num, idx) => (
@@ -564,15 +634,17 @@ const DetailView: React.FC<{ item: AreaInfo; goBack: () => void; toggleSave: (e:
               ))}
             </section>
           )}
-          <section className="space-y-3">
-            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ঠিকানা ও ম্যাপ</h4>
-            {item.addresses.map((addr, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <p className="text-[13px] text-gray-700 font-medium leading-relaxed">{addr}</p>
-                <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shadow-sm"><ExternalLink className="w-4 h-4" /></button>
-              </div>
-            ))}
-          </section>
+          {!isPersonality && (
+            <section className="space-y-3">
+              <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ঠিকানা ও ম্যাপ</h4>
+              {item.addresses.map((addr, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                  <p className="text-[13px] text-gray-700 font-medium leading-relaxed">{addr}</p>
+                  <button onClick={() => openInMaps(addr)} className="shrink-0 p-3 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shadow-sm"><ExternalLink className="w-4 h-4" /></button>
+                </div>
+              ))}
+            </section>
+          )}
         </div>
       </div>
     </div>
@@ -583,7 +655,7 @@ const AboutView: React.FC<{ goBack: () => void }> = ({ goBack }) => (
   <div className="fixed inset-0 z-50 bg-[#f8fafc] overflow-y-auto animate-in slide-in-from-right duration-300 safe-top">
     <header className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 py-4 flex items-center gap-4"><button onClick={goBack} className="p-2 hover:bg-gray-50 rounded-xl transition-all"><ArrowLeft className="w-5 h-5 text-gray-600" /></button><h2 className="text-base font-bold text-gray-800">অ্যাপ তথ্য</h2></header>
     <main className="max-w-md mx-auto p-6 space-y-10 pb-20">
-      <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 shadow-sm"><div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl mb-6 shadow-indigo-200"><MapPin className="w-10 h-10 text-white" /></div><h3 className="text-2xl font-black text-gray-800">আমার পাবনা</h3><p className="text-[10px] text-gray-400 font-bold mt-2 uppercase tracking-widest">ভার্সন: ৫.১.১ (ডিটেইল ভিউ আপডেট)</p></div>
+      <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 shadow-sm"><div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-xl mb-6 shadow-indigo-200"><MapPin className="w-10 h-10 text-white" /></div><h3 className="text-2xl font-black text-gray-800">আমার পাবনা</h3><p className="text-[10px] text-gray-400 font-bold mt-2 uppercase tracking-widest">ভার্সন: ৫.২.০ (ব্যক্তিত্ব ক্যাটাগরি আপডেট)</p></div>
       <section className="space-y-4"><h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">ডেভেলপার প্রোফাইল</h4><div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5"><div className="w-16 h-16 overflow-hidden rounded-2xl shadow-sm border-2 border-indigo-50"><img src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" className="w-full h-full object-cover" /></div><div><h5 className="font-bold text-gray-800 text-base">মীর রাব্বি হোসেন</h5><p className="text-[11px] text-indigo-600 font-bold uppercase tracking-wider">পাবনা জেলা, বাংলাদেশ</p></div></div></section>
     </main>
   </div>

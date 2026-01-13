@@ -14,6 +14,7 @@ export enum Category {
   BLOOD_BANK = 'ব্লাড ব্যাংক',
   TOURIST_SPOT = 'দর্শনীয় স্থান',
   ANCIENT_ARCH = 'প্রাচীন স্থাপত্য',
+  PERSONALITY = 'ব্যক্তিত্ব',
   OTHER = 'অন্যান্য'
 }
 
@@ -34,6 +35,10 @@ export interface AreaInfo {
   imageUrl?: string;
   galleryImages?: string[];
   howToGo?: string;
+  dob?: string;
+  dod?: string;
+  pob?: string;
+  profession?: string;
   addedBy: string;
   timestamp: number;
   socialLinks?: SocialLink[];
