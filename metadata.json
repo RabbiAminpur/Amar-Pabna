@@ -1,0 +1,7 @@
+{
+  "name": "Amar Pabna (আমার পাবনা)",
+  "description": "একটি সাধারণ ও পরিষ্কার অ্যাপ যেখানে আপনি পাবনা এলাকার তথ্য শেয়ার ও সংরক্ষণ করতে পারবেন।",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
