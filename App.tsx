@@ -243,10 +243,16 @@ const DetailView: React.FC<{
       </div>
       
       <div className="p-6 max-w-md mx-auto">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center justify-between gap-2 mb-2">
           <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-lg uppercase">{item.category}</span>
+          {/* Moved Timestamp to the top for better visibility */}
+          <div className="flex items-center gap-1.5 opacity-60">
+            <Clock className="w-3 h-3 text-indigo-400" />
+            <span className="text-[10px] text-gray-500 font-bold">{formatTimestamp(item.timestamp)}</span>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight">{item.title}</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 tracking-tight leading-tight">{item.title}</h2>
+        
         <p className="text-gray-600 text-sm leading-relaxed mb-10 whitespace-pre-wrap">{item.description}</p>
         
         <div className="space-y-8 pb-10">
@@ -296,7 +302,7 @@ const DetailView: React.FC<{
             ))}
           </section>
 
-          {/* Collector Note Section with Image and Updated Timestamp */}
+          {/* Collector Note Section (Timestamp removed from here) */}
           <section className="mt-12 pt-8 border-t border-dashed border-gray-200">
             <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -312,13 +318,6 @@ const DetailView: React.FC<{
                   <p className="text-sm font-bold text-gray-700">মীর রাব্বি হোসেন</p>
                 </div>
               </div>
-            </div>
-            
-            <div className="mt-6 flex flex-col items-center gap-1.5 opacity-60">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                <Clock className="w-3 h-3" /> সর্বশেষ আপডেট
-              </div>
-              <p className="text-[11px] text-gray-500 font-medium">{formatTimestamp(item.timestamp)}</p>
             </div>
           </section>
         </div>
