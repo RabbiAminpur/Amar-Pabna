@@ -254,11 +254,15 @@ const DetailView: React.FC<{
           ))}
         </section>
 
-        {/* Collector Note Section */}
+        {/* Collector Note Section with Image */}
         <section className="mt-12 pt-8 border-t border-dashed border-gray-200">
           <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-              <Edit3 className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-white shrink-0">
+              <img 
+                src="https://i.ibb.co/Fkj5KSYt/20250424-095936-pica-1-png.jpg" 
+                alt="Mir Rabbi Hossain" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">তথ্য সংগ্রহকারী</p>
